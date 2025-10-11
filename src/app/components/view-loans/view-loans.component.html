@@ -1,0 +1,55 @@
+<div class="view-loans-container">
+  <h2 class="page-title">Ongoing Loans</h2>
+
+  <div class="loans-grid" *ngIf="loans && loans.length > 0; else noLoans">
+    <div class="loan-card" *ngFor="let loan of loans">
+      <div class="loan-header">
+        <h4>{{ loan.borrowerName }}</h4>
+        <!-- 🗑️ Delete Icon -->
+        <button class="delete-btn" (click)="deleteLoan(loan)" title="Delete Loan">
+          <i class="bi bi-trash-fill"></i>delete
+        </button>
+      </div>
+
+      <div class="loan-info">
+        <p><span>Total Principal:</span> ₹{{ loan.principalAMT | number }}</p>
+        <p><span>Total Amount:</span> ₹{{ loan.totalAmount | number }}</p>
+        <p><span>Start Date:</span> {{ loan.startDate | date:'dd MMM yyyy' }}</p>
+        <p><span>End Date:</span> {{ loan.endDate | date:'dd MMM yyyy' }}</p>
+      </div>
+
+      <button class="view-more-btn" (click)="toggleDetails(loan)">
+        {{ loan.showDetails ? 'Hide Details' : 'View More' }}
+      </button>
+
+      <div class="loan-details" *ngIf="loan.showDetails">
+        <hr />
+        <p><span>Borrower Contact:</span> {{ loan.borrowerContact }}</p>
+        <p><span>Security Asset:</span> {{ loan.securityAsset || 'N/A' }}</p>
+        <p><span>Interest %:</span> {{ loan.int }}%</p>
+        <p><span>Investor:</span> {{ loan.investor || 'N/A' }}</p>
+        <p><span>Investor %:</span> {{ loan.investorPercentage || 'N/A' }}%</p>
+        <p><span>Total Tenure:</span> {{ loan.totalTenure || 'N/A' }} months</p>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #noLoans>
+    <p class="no-loans-text">No ongoing loans found.</p>
+  </ng-template>
+</div>
+
+<nav class="bottom-nav">
+  <a routerLink="/home" class="nav-btn">
+    <i class="bi bi-house-door-fill"></i>
+    <span>Home</span>
+  </a>
+  <a routerLink="/add-loan-forms" class="nav-btn">
+    <i class="bi bi-plus-circle-fill"></i>
+    <span>Add Loan</span>
+  </a>
+  <a routerLink="/more-Actions" class="nav-btn">
+    <i class="bi bi-grid-fill"></i>
+    <span>More</span>
+  </a>
+</nav>

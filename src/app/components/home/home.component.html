@@ -1,0 +1,79 @@
+<div class="home-container">
+  <!-- 🏦 Total Disbursed Section -->
+  <div class="total-disbursed-section">
+    <div class="total-disbursed-card">
+      <span class="total-title">TOTAL DISBURSED AMOUNT</span>
+
+      <div class="total-amount" *ngIf="showTotalDisbursed">
+        ₹{{ totalDisbursedAmount | number: '1.0-0' }}
+      </div>
+
+      <button class="check-btn" (click)="toggleTotalDisbursed()">
+        {{ showTotalDisbursed ? 'HIDE' : 'CHECK' }}
+      </button>
+
+    </div>
+  </div>
+
+  <!-- ➕ Add New Loan Button -->
+  <div class="add-loan-container">
+    <button class="add-btn" routerLink="/add-loan-forms">
+      <i class="bi bi-plus-lg"></i> ADD New Loan
+    </button>
+  </div>
+
+  <!-- 🔔 Upcoming Loan Collections -->
+  <div class="collections-section">
+    <h2 class="page-title"><i class="bi bi-bell-fill me-2"></i> Your Next Loan Collections</h2>
+
+    <div class="loans-grid">
+      <div class="loan-card" *ngFor="let loan of upcomingLoans"
+        [ngClass]="{'loan-ending-today': isLoanEndingToday(loan)}">
+        <div class="loan-header">
+          <h4>{{ loan.borrowerName }}</h4>
+        </div>
+
+        <div class="loan-info">
+          <p><span>Principal:</span> ₹{{ loan.principalAMT | number }}</p>
+          <p><span>Interest:</span> {{ loan.int }}%</p>
+          <p><span>Start Date:</span> {{ loan.startDate | date:'dd MMM yyyy' }}</p>
+          <p><span>End Date:</span> {{ loan.endDate | date:'dd MMM yyyy' }}</p>
+        </div>
+
+        <div class="loan-actions">
+          <button class="view-more-btn" (click)="toggleDetails(loan)">
+            {{ loan.showDetails ? 'Hide Details' : 'View More' }}
+          </button>
+          <button class="edit-btn" (click)="goToAddLoanForm()">Edit Loan</button>
+        </div>
+
+        <div class="loan-details" *ngIf="loan.showDetails">
+          <hr />
+          <p><span>Borrower Contact:</span> {{ loan.borrowerContact || 'N/A' }}</p>
+          <p><span>Security Asset:</span> {{ loan.securityAsset || 'N/A' }}</p>
+          <p><span>Investor:</span> {{ loan.investor || 'N/A' }}</p>
+          <p><span>Investor %:</span> {{ loan.investorPercentage || 'N/A' }}</p>
+          <p><span>Total Tenure:</span> {{ loan.totalTenure || 'N/A' }} months</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🔽 Bottom Navigation -->
+  <nav class="bottom-nav">
+    <a routerLink="/home" class="nav-btn active">
+      <i class="bi bi-house-door-fill"></i>
+      <span>Home</span>
+    </a>
+    <a routerLink="/viewLoans" class="nav-btn">
+      <i class="bi bi-plus-circle-fill"></i>
+      <span>View Ongoing Loans</span>
+    </a>
+    <a routerLink="/more-Actions" class="nav-btn">
+      <i class="bi bi-grid-fill"></i>
+      <span>More</span>
+    </a>
+  </nav>
+  <span></span>
+  <div class="div"></div>
+</div>

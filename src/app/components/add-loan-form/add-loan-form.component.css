@@ -1,0 +1,127 @@
+body {
+  background-color: #f8f9fa;
+}
+
+.form-card {
+  max-width: 900px;
+  margin: auto;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15); /* ✅ stronger smooth shadow */
+  transition: box-shadow 0.3s ease;
+  margin-bottom: 100px;
+}
+
+.form-card:hover {
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25); /* ✅ subtle hover lift */
+}
+
+
+.form-label {
+  font-weight: 500;
+}
+
+input.form-control {
+  border-radius: 12px;
+  height: 45px;
+  padding: 10px 15px;
+}
+
+button {
+  border-radius: 25px;
+}
+
+/* Submit Button Hover */
+.btn-primary:hover {
+  background-color: #064aaf;
+}
+
+.backBtnDiv{
+    display: flex;
+    margin-top: 30px;
+}
+
+/* Back Button Style */
+.back-btn {
+  border-radius: 25px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.back-btn:hover {
+  background-color: #212121;
+  color: white;
+  transform: scale(1.05);
+}
+
+.bottom-nav {
+  position: fixed;
+  cursor: pointer;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 92%;
+  max-width: 1100px;
+  background: rgba(43, 42, 42, 0.65);
+  backdrop-filter: blur(8px);
+  border-radius: 30px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 10px 12px;
+  z-index: 1000;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+.nav-btn {
+  color: #00ffc3;
+  font-weight: 500;
+  text-decoration: none;
+  text-align: center;
+  font-size: 0.95rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.3s ease;
+}
+
+.nav-btn i {
+  font-size: 1.3rem;
+}
+
+.nav-btn:hover {
+  color: #ff9100;
+  transform: scale(1.1);
+}
+
+.nav-btn.active {
+  color: #ff9100;
+  text-shadow: 0 0 10px rgba(255, 145, 0, 0.6);
+}
+
+/* Responsive Back Button */
+@media (max-width: 576px) {
+  .back-btn {
+    font-size: 0.9rem;
+    padding: 6px 12px;
+  }
+
+  h4 {
+    font-size: 1.1rem;
+  }
+
+  @media (max-width: 650px) {
+
+    .btn-back{
+      background-color: #212121;
+      color: #ffffff;
+    }
+
+    .btn-back:hover{
+      background-color: #4b4a4a;
+    }
+
+    
+  }
+}
