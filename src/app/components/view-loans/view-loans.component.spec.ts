@@ -1,41 +1,23 @@
-import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { RouterLink } from '@angular/router';
-import { Loan, LoanService } from '../../services/loan.service';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-@Component({
-  selector: 'app-view-loans',
-  standalone: true,
-  imports: [CommonModule, RouterLink],
-  templateUrl: './view-loans.component.html',
-  styleUrls: ['./view-loans.component.css']
-})
-export class ViewLoansComponent implements OnInit {
-  loans: Loan[] = [];
+import { ViewLoansComponent } from './view-loans.component';
 
-  constructor(private loanService: LoanService) {}
+describe('Home', () => {
+  let component: ViewLoansComponent;
+  let fixture: ComponentFixture<ViewLoansComponent>;
 
-  ngOnInit(): void {
-    this.loadLoans();
-  }
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [ViewLoansComponent]
+    })
+    .compileComponents();
 
-  loadLoans(): void {
-    this.loanService.getLoans().subscribe((loans: Loan[]) => {
-      this.loans = loans;
-    });
-  }
+    fixture = TestBed.createComponent(ViewLoansComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
 
-  toggleDetails(loan: Loan) {
-    loan.showDetails = !loan.showDetails;
-  }
-
-  deleteLoan(loan: Loan) {
-    const confirmDelete = confirm(`Are you sure you want to delete the loan for "${loan.borrowerName}"?`);
-    if (confirmDelete) {
-      this.loanService.deleteLoan(loan).subscribe(() => {
-        this.loans = this.loans.filter(l => l !== loan); // remove from UI
-        alert('Loan deleted successfully!');
-      });
-    }
-  }
-}
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});

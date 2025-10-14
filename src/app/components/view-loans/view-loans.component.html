@@ -2,27 +2,69 @@
   <h2 class="page-title">Ongoing Loans</h2>
 
   <div class="loans-grid" *ngIf="loans && loans.length > 0; else noLoans">
-    <div class="loan-card" *ngFor="let loan of loans">
+    <div class="loan-card" *ngFor="let loan of loans" [ngClass]="{'editing': loan.isEditing}">
+
+      <!-- Header -->
       <div class="loan-header">
-        <h4>{{ loan.borrowerName }}</h4>
-        <!-- 🗑️ Delete Icon -->
+        <h4 *ngIf="!loan.isEditing">{{ loan.borrowerName }}</h4>
+        <input *ngIf="loan.isEditing" [(ngModel)]="loan.borrowerName" placeholder="Borrower Name" />
+
+        <!-- Delete button hidden when editing -->
         <button class="delete-btn" (click)="deleteLoan(loan)" title="Delete Loan">
-          <i class="bi bi-trash-fill"></i>delete
+          <i class="bi bi-trash-fill"></i> delete
         </button>
       </div>
 
-      <div class="loan-info">
+      <!-- Loan Info (view mode) -->
+      <div class="loan-info" *ngIf="!loan.isEditing">
         <p><span>Total Principal:</span> ₹{{ loan.principalAMT | number }}</p>
         <p><span>Total Amount:</span> ₹{{ loan.totalAmount | number }}</p>
         <p><span>Start Date:</span> {{ loan.startDate | date:'dd MMM yyyy' }}</p>
         <p><span>End Date:</span> {{ loan.endDate | date:'dd MMM yyyy' }}</p>
       </div>
 
-      <button class="view-more-btn" (click)="toggleDetails(loan)">
-        {{ loan.showDetails ? 'Hide Details' : 'View More' }}
-      </button>
+      <!-- Loan Edit Form (edit mode) -->
+      <div class="loan-edit" *ngIf="loan.isEditing">
+        <label>Principal (₹):</label>
+        <input type="number" [(ngModel)]="loan.principalAMT" />
 
-      <div class="loan-details" *ngIf="loan.showDetails">
+        <label>Interest (%):</label>
+        <input type="number" [(ngModel)]="loan.int" />
+
+        <label>End Date:</label>
+        <input type="date" [(ngModel)]="loan.endDate" />
+
+        <label>Borrower Contact:</label>
+        <input type="text" [(ngModel)]="loan.borrowerContact" />
+
+        <label>Security Asset:</label>
+        <input type="text" [(ngModel)]="loan.securityAsset" />
+
+        <label>Investor:</label>
+        <input type="text" [(ngModel)]="loan.investor" />
+
+        <label>Investor %:</label>
+        <input type="number" [(ngModel)]="loan.investorPercentage" />
+
+        <label>Total Tenure (months):</label>
+        <input type="number" [(ngModel)]="loan.totalTenure" />
+      </div>
+
+      <!-- Action Buttons -->
+      <div *ngIf="!loan.isEditing">
+        <button class="view-more-btn" (click)="toggleDetails(loan)">
+          {{ loan.showDetails ? 'Hide Details' : 'View More' }}
+        </button>
+        <button class="view-more-btn" (click)="editLoan(loan)">Edit</button>
+      </div>
+
+      <div *ngIf="loan.isEditing">
+        <button class="view-more-btn save" (click)="saveLoan(loan)">Save</button>
+        <button class="view-more-btn cancel" (click)="cancelEdit(loan)">Cancel</button>
+      </div>
+
+      <!-- Loan Details (only in view mode) -->
+      <div class="loan-details" *ngIf="loan.showDetails && !loan.isEditing">
         <hr />
         <p><span>Borrower Contact:</span> {{ loan.borrowerContact }}</p>
         <p><span>Security Asset:</span> {{ loan.securityAsset || 'N/A' }}</p>
@@ -31,6 +73,7 @@
         <p><span>Investor %:</span> {{ loan.investorPercentage || 'N/A' }}%</p>
         <p><span>Total Tenure:</span> {{ loan.totalTenure || 'N/A' }} months</p>
       </div>
+
     </div>
   </div>
 

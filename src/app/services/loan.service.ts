@@ -4,8 +4,8 @@ import { BehaviorSubject, Observable, of } from 'rxjs';
 export interface Loan {
   borrowerName: string;
   principalAMT: number;
-  int: number;               // Interest %
-  totalAmount: number;       // Calculated total
+  int: number;
+  totalAmount: number;
   startDate: Date;
   endDate: Date;
   borrowerContact?: string;
@@ -14,6 +14,7 @@ export interface Loan {
   investorPercentage?: number;
   totalTenure?: number;
   showDetails?: boolean;
+  isEditing?: boolean;
 }
 
 @Injectable({
@@ -27,39 +28,29 @@ export class LoanService {
     this.loansSubject = new BehaviorSubject<Loan[]>(storedLoans);
   }
 
-  // -------------------------------
-  // Browser-safe localStorage load
-  // -------------------------------
   private loadLoansFromStorage(): Loan[] {
-    if (typeof window !== 'undefined') { // Ensure we're in browser
+    if (typeof window !== 'undefined') {
       const stored = localStorage.getItem('loans');
       const loans: Loan[] = stored ? JSON.parse(stored) : [];
-      // Convert date strings to Date objects
       loans.forEach(loan => {
         loan.startDate = new Date(loan.startDate);
         loan.endDate = new Date(loan.endDate);
       });
       return loans;
     }
-    return []; // fallback for SSR
+    return [];
   }
 
   private saveLoansToStorage(loans: Loan[]): void {
-    if (typeof window !== 'undefined') { // Browser only
+    if (typeof window !== 'undefined') {
       localStorage.setItem('loans', JSON.stringify(loans));
     }
   }
 
-  // -------------------------------
-  // Observable to subscribe
-  // -------------------------------
   getLoans(): Observable<Loan[]> {
     return this.loansSubject.asObservable();
   }
 
-  // -------------------------------
-  // Add loan
-  // -------------------------------
   addLoan(loan: Loan): void {
     const current = this.loansSubject.getValue();
     const updated = [...current, loan];
@@ -67,13 +58,18 @@ export class LoanService {
     this.saveLoansToStorage(updated);
   }
 
-  // -------------------------------
-  // Delete loan
-  // -------------------------------
   deleteLoan(loan: Loan): Observable<boolean> {
     const updatedLoans = this.loansSubject.value.filter(l => l !== loan);
     this.loansSubject.next(updatedLoans);
     this.saveLoansToStorage(updatedLoans);
-    return of(true); // simulate success
+    return of(true);
+  }
+
+  updateLoan(updatedLoan: Loan): void {
+    const loans = this.loansSubject.getValue().map(loan =>
+      loan.borrowerName === updatedLoan.borrowerName ? updatedLoan : loan
+    );
+    this.loansSubject.next(loans);
+    this.saveLoansToStorage(loans);
   }
 }

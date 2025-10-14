@@ -186,3 +186,115 @@
   color: #ff0000;
   transform: scale(1.2);
 }
+
+
+/* ===== EDIT FEATURE STYLING ===== */
+
+/* Edit button inside each card */
+.loan-card .edit-btn {
+  background-color: #0078d7;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.loan-card .edit-btn:hover {
+  background-color: #005fa3;
+  transform: scale(1.05);
+}
+
+/* Save and Cancel buttons */
+.edit-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.edit-actions button {
+  padding: 6px 14px;
+  font-size: 0.9rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.25s ease-in-out;
+}
+
+.save-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+.save-btn:hover {
+  background-color: #218838;
+  transform: scale(1.05);
+}
+
+.cancel-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.cancel-btn:hover {
+  background-color: #c82333;
+  transform: scale(1.05);
+}
+
+/* Input fields in edit mode */
+.loan-card input[type="text"],
+.loan-card input[type="number"],
+.loan-card input[type="date"] {
+  width: 95%;
+  padding: 6px;
+  font-size: 0.9rem;
+  border: 1.5px solid #ccc;
+  border-radius: 6px;
+  transition: all 0.25s ease;
+  background-color: #f9f9f9;
+}
+
+.loan-card input:focus {
+  outline: none;
+  border-color: #0078d7;
+  background-color: #eef6ff;
+  box-shadow: 0 0 5px rgba(0, 120, 215, 0.4);
+}
+
+/* Edit section layout */
+.edit-section {
+  background-color: #f8faff;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 8px;
+  border: 1px solid #d0e3ff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease-in-out;
+}
+
+.edit-section:hover {
+  box-shadow: 0 4px 10px rgba(0, 120, 215, 0.15);
+}
+
+/* For smoother show/hide effect */
+.edit-section {
+  opacity: 0;
+  transform: translateY(-5px);
+  animation: fadeInEdit 0.3s forwards;
+}
+
+@keyframes fadeInEdit {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.loan-card.editing .delete-btn {
+  display: none;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.25s ease-in-out;
+}
