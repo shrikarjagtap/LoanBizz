@@ -15,6 +15,7 @@ export interface Loan {
   totalTenure?: number;
   showDetails?: boolean;
   isEditing?: boolean;
+  loanId?: number;  // unique ID
 }
 
 @Injectable({
@@ -35,6 +36,8 @@ export class LoanService {
       loans.forEach(loan => {
         loan.startDate = new Date(loan.startDate);
         loan.endDate = new Date(loan.endDate);
+        // regenerate loanId on load to ensure uniqueness
+        loan.loanId = this.generateLoanId(loan);
       });
       return loans;
     }
@@ -52,6 +55,7 @@ export class LoanService {
   }
 
   addLoan(loan: Loan): void {
+    loan.loanId = this.generateLoanId(loan); // assign unique ID when adding
     const current = this.loansSubject.getValue();
     const updated = [...current, loan];
     this.loansSubject.next(updated);
@@ -59,7 +63,7 @@ export class LoanService {
   }
 
   deleteLoan(loan: Loan): Observable<boolean> {
-    const updatedLoans = this.loansSubject.value.filter(l => l !== loan);
+    const updatedLoans = this.loansSubject.value.filter(l => l.loanId !== loan.loanId);
     this.loansSubject.next(updatedLoans);
     this.saveLoansToStorage(updatedLoans);
     return of(true);
@@ -67,9 +71,17 @@ export class LoanService {
 
   updateLoan(updatedLoan: Loan): void {
     const loans = this.loansSubject.getValue().map(loan =>
-      loan.borrowerName === updatedLoan.borrowerName ? updatedLoan : loan
+      loan.loanId === updatedLoan.loanId ? updatedLoan : loan
     );
     this.loansSubject.next(loans);
     this.saveLoansToStorage(loans);
+  }
+
+  private generateLoanId(loan: Loan): number {
+    const start = loan.startDate.getTime();
+    const end = loan.endDate.getTime();
+    const timestamp = Date.now();
+    const total = loan.totalAmount || 0;
+    return timestamp + (end - start) + total;
   }
 }

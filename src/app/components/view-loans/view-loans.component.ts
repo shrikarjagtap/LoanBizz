@@ -7,13 +7,13 @@ import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-view-loans',
   standalone: true,
-  imports: [CommonModule, RouterLink,FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule],
   templateUrl: './view-loans.component.html',
   styleUrls: ['./view-loans.component.css']
 })
 export class ViewLoansComponent implements OnInit {
   loans: Loan[] = [];
-  private backupLoan: { [key: string]: Loan } = {}; // temp storage for cancel
+  private backupLoan: { [key: number]: Loan } = {}; // backup by loanId
 
   constructor(private loanService: LoanService, private router: Router) {}
 
@@ -39,32 +39,35 @@ export class ViewLoansComponent implements OnInit {
     const confirmDelete = confirm(`Are you sure you want to delete the loan for "${loan.borrowerName}"?`);
     if (confirmDelete) {
       this.loanService.deleteLoan(loan).subscribe(() => {
-        this.loans = this.loans.filter(l => l !== loan);
+        this.loans = this.loans.filter(l => l.loanId !== loan.loanId);
         alert('Loan deleted successfully!');
       });
     }
   }
 
-  // -------------------- Edit Feature --------------------
   editLoan(loan: Loan) {
-    // backup current values in case of cancel
-    this.backupLoan[loan.borrowerName] = { ...loan };
+    // backup by loanId
+    this.backupLoan[loan.loanId!] = { ...loan };
     loan.isEditing = true;
   }
 
   saveLoan(loan: Loan) {
     loan.isEditing = false;
-    // save changes to the service
+    // recalc totalAmount if principal or int changed
+    loan.totalAmount = loan.principalAMT + (loan.principalAMT * loan.int) / 100;
     this.loanService.updateLoan(loan);
   }
 
   cancelEdit(loan: Loan) {
     loan.isEditing = false;
-    // restore backup values
-    const backup = this.backupLoan[loan.borrowerName];
+    const backup = this.backupLoan[loan.loanId!];
     if (backup) {
       Object.assign(loan, backup);
-      delete this.backupLoan[loan.borrowerName];
+      delete this.backupLoan[loan.loanId!];
     }
+  }
+
+  trackByLoanId(index: number, loan: Loan): any {
+    return loan.loanId;
   }
 }
