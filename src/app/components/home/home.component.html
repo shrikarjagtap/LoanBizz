@@ -35,6 +35,7 @@
 
         <div class="loan-info">
           <p><span>Principal:</span> ₹{{ loan.principalAMT | number }}</p>
+          <p><span>Principal:</span> ₹{{ loan.totalAmount | number }}</p>
           <p><span>Interest:</span> {{ loan.int }}%</p>
           <p><span>Start Date:</span> {{ loan.startDate | date:'dd MMM yyyy' }}</p>
           <p><span>End Date:</span> {{ loan.endDate | date:'dd MMM yyyy' }}</p>
