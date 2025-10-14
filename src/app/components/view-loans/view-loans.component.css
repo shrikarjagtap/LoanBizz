@@ -22,6 +22,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
   gap: 25px;
+  align-items: start; 
 }
 
 /* 💳 Individual Loan Card */
@@ -33,6 +34,8 @@
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column; 
 }
 
 .loan-card:hover {
