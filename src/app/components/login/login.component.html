@@ -1,0 +1,38 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <h2 class="page-title">Login</h2>
+
+    <form (ngSubmit)="loginUser()" #loginForm="ngForm">
+
+      <!-- Gmail / ID -->
+      <label for="gmail">Gmail ID</label>
+      <input
+        type="email"
+        id="gmail"
+        name="gmail"
+        [(ngModel)]="email"
+        required
+        placeholder="Enter your Gmail"
+      />
+
+      <!-- Password -->
+      <label for="password">Password</label>
+      <input
+        type="password"
+        id="password"
+        name="password"
+        [(ngModel)]="password"
+        required
+        placeholder="Enter your password"
+      />
+
+      <button type="submit" [disabled]="loginForm.invalid" class="auth-btn">
+        Login
+      </button>
+
+      <p class="redirect-text">
+        Don't have an account? <a routerLink="/register">Register here</a>
+      </p>
+    </form>
+  </div>
+</div>

@@ -1,4 +1,12 @@
 <div class="home-container">
+
+  <div class="logoutDiv"><button class="logout-btn" (click)="logout()">Logout</button></div>
+  
+  <div class="home-header">
+  <h2 class="welcome-text">Welcome, {{ currentUser?.name || 'User' }} 👋</h2>
+  <!-- <button class="logout-btn" (click)="logout()">Logout</button> -->
+ </div>
+
   <!-- 🏦 Total Disbursed Section -->
   <div class="total-disbursed-section">
     <div class="total-disbursed-card">

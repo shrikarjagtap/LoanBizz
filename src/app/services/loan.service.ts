@@ -16,7 +16,7 @@ export interface Loan {
   showDetails?: boolean;
   isEditing?: boolean;
   loanId?: number;
-  isClosed?: boolean; // ✅ NEW FLAG
+  isClosed?: boolean; // ✅ Loan closed flag
 }
 
 @Injectable({
@@ -26,33 +26,50 @@ export class LoanService {
   private loansSubject: BehaviorSubject<Loan[]>;
   private closedLoansSubject: BehaviorSubject<Loan[]>;
 
-  constructor() {
-    const storedLoans: Loan[] = this.loadLoansFromStorage('loans');
-    const closedLoans: Loan[] = this.loadLoansFromStorage('closedLoans');
+  private currentUserEmail: string | null = null; // ✅ Added: track logged-in user
 
-    this.loansSubject = new BehaviorSubject<Loan[]>(storedLoans);
-    this.closedLoansSubject = new BehaviorSubject<Loan[]>(closedLoans);
+  constructor() {
+    // Initial empty subjects; will load when user logs in
+    this.loansSubject = new BehaviorSubject<Loan[]>([]);
+    this.closedLoansSubject = new BehaviorSubject<Loan[]>([]);
   }
 
-  // ✅ Load from storage (ongoing or closed)
-  private loadLoansFromStorage(key: string): Loan[] {
+  // ✅ Set current user after login
+  setCurrentUser(email: string) {
+    this.currentUserEmail = email;
+
+    // Load user-specific loans
+    const storedLoans = this.loadLoansFromStorage('loans');
+    const storedClosed = this.loadLoansFromStorage('closedLoans');
+    this.loansSubject.next(storedLoans);
+    this.closedLoansSubject.next(storedClosed);
+  }
+
+  // ✅ Generate per-user storage key
+  private getUserKey(key: 'loans' | 'closedLoans'): string {
+    if (!this.currentUserEmail) throw new Error('User not set');
+    return `${key}_${this.currentUserEmail}`;
+  }
+
+  // ✅ Load from storage (user-specific)
+  private loadLoansFromStorage(key: 'loans' | 'closedLoans'): Loan[] {
     if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem(key);
+      const stored = localStorage.getItem(this.getUserKey(key));
       const loans: Loan[] = stored ? JSON.parse(stored) : [];
       loans.forEach(loan => {
         loan.startDate = new Date(loan.startDate);
         loan.endDate = new Date(loan.endDate);
-        loan.loanId = this.generateLoanId(loan);
+        loan.loanId = loan.loanId || this.generateLoanId(loan);
       });
       return loans;
     }
     return [];
   }
 
-  // ✅ Save to storage
-  private saveLoansToStorage(loans: Loan[], key: string): void {
+  // ✅ Save to storage (user-specific)
+  private saveLoansToStorage(loans: Loan[], key: 'loans' | 'closedLoans'): void {
     if (typeof window !== 'undefined') {
-      localStorage.setItem(key, JSON.stringify(loans));
+      localStorage.setItem(this.getUserKey(key), JSON.stringify(loans));
     }
   }
 
@@ -87,6 +104,13 @@ export class LoanService {
     this.loansSubject.next(updatedLoans);
     this.saveLoansToStorage(updatedLoans, 'loans');
     return of(true);
+  }
+
+  // ✅ Delete closed loan permanently
+  deleteClosedLoan(loan: Loan): void {
+    const updatedClosed = this.closedLoansSubject.value.filter(l => l.loanId !== loan.loanId);
+    this.closedLoansSubject.next(updatedClosed);
+    this.saveLoansToStorage(updatedClosed, 'closedLoans');
   }
 
   // ✅ Close Loan (move from active → closed)

@@ -1,0 +1,29 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <h2 class="page-title">Register</h2>
+
+    <form (ngSubmit)="registerUser()" #registerForm="ngForm">
+
+      <label for="name">Name</label>
+      <input type="text" id="name" name="name" [(ngModel)]="name" required placeholder="Your full name" />
+
+      <label for="phone">Phone Number</label>
+      <input type="text" id="phone" name="phone" [(ngModel)]="phone" required placeholder="Your phone number" />
+
+      <label for="gmail">Gmail ID</label>
+      <input type="email" id="gmail" name="gmail" [(ngModel)]="gmail" required placeholder="Your Gmail" />
+
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" [(ngModel)]="password" required placeholder="Password" />
+
+      <label for="confirmPassword">Confirm Password</label>
+      <input type="password" id="confirmPassword" name="confirmPassword" [(ngModel)]="confirmPassword" required placeholder="Confirm Password" />
+
+      <button type="submit" [disabled]="registerForm.invalid" class="auth-btn">Register</button>
+
+      <p class="redirect-text">
+        Already have an account? <a routerLink="/login">Login here</a>
+      </p>
+    </form>
+  </div>
+</div>

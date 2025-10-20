@@ -3,6 +3,7 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Loan, LoanService } from '../../services/loan.service';
+import { AuthService, User } from '../../services/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -15,10 +16,21 @@ export class HomeComponent implements OnInit {
   upcomingLoans: Loan[] = [];
   showTotalDisbursed = false;
   totalDisbursedAmount = 0;
+  currentUser: User | null = null;
 
-  constructor(private router: Router, private loanService: LoanService) {}
+  constructor(
+    private router: Router, 
+    private loanService: LoanService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
+     this.currentUser = this.authService.getCurrentUser(); // ✅ Get current user
+    if (!this.currentUser) {
+      this.router.navigate(['/login']); // redirect if not logged in
+      return;
+    }
+
     this.loadUpcomingLoans();
   }
 
@@ -102,4 +114,13 @@ export class HomeComponent implements OnInit {
       d1.getFullYear() === d2.getFullYear()
     );
   }
+
+  logout(): void {
+    const confirmLogout = confirm('Are you sure you want to log out?');
+    if (confirmLogout) {
+      this.authService.logout()
+    this.router.navigate(['/login']);
+    }
+  }
+
 }
