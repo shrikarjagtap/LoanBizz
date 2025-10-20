@@ -3,6 +3,7 @@ import { HomeComponent } from './components/home/home.component';
 import { AddLoanFormComponent } from './components/add-loan-form/add-loan-form.component';
 import { MoreActionsComponent } from './components/more-actions/more-actions.component';
 import { ViewLoansComponent } from './components/view-loans/view-loans.component';
+import { ClosedLoansComponent } from './components/closed-loans/closed-loans.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -11,5 +12,6 @@ export const routes: Routes = [
   { path: 'home', component: HomeComponent },
   {path:'add-loan-forms',component:AddLoanFormComponent},
   {path:'more-Actions', component:MoreActionsComponent},
-  {path:'viewLoans',component:ViewLoansComponent}
+  {path:'viewLoans',component:ViewLoansComponent},
+  {path:'closedLoans',component:ClosedLoansComponent}
 ];

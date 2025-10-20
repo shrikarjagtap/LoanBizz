@@ -1,0 +1,69 @@
+<div class="view-loans-container">
+  <h2 class="page-title">Closed Loans</h2>
+
+  <div class="loans-grid" *ngIf="closedLoans.length > 0; else noClosed">
+    <div class="loan-card closed" *ngFor="let loan of closedLoans">
+      
+      <!-- Header -->
+      <div class="loan-header">
+        <h4>{{ loan.borrowerName }}</h4>
+
+        <!-- Status tag -->
+        <span class="status-tag">
+          <i class="bi bi-check-circle-fill"></i> Closed
+        </span>
+
+        <!-- Delete button -->
+        <button class="delete-btn" (click)="deleteClosedLoan(loan)" title="Delete permanently">Delete</button>
+      </div>
+
+      <!-- Compact info -->
+      <div class="loan-info">
+        <p><span>Loan ID:</span> {{ loan.loanId }}</p>
+        <p><span>Principal:</span> ₹{{ loan.principalAMT | number }}</p>
+        <p><span>Total Amount:</span> ₹{{ loan.totalAmount | number }}</p>
+      </div>
+
+      <!-- Expanded details -->
+      <div class="loan-details" *ngIf="expandedLoans[getSafeId(loan)]">
+        <hr />
+        <p><span>Borrower Contact:</span> {{ loan.borrowerContact || 'N/A' }}</p>
+        <p><span>Security Asset:</span> {{ loan.securityAsset || 'N/A' }}</p>
+        <p><span>Interest %:</span> {{ loan.int || 0 }}%</p>
+        <p><span>Investor:</span> {{ loan.investor || 'N/A' }}</p>
+        <p><span>Investor %:</span> {{ loan.investorPercentage || 'N/A' }}%</p>
+        <p><span>Total Tenure:</span> {{ loan.totalTenure || 'N/A' }} months</p>
+        <p><span>Start Date:</span> {{ loan.startDate | date:'dd MMM yyyy' }}</p>
+        <p><span>End Date:</span> {{ loan.endDate | date:'dd MMM yyyy' }}</p>
+      </div>
+
+      <!-- Actions -->
+      <div class="card-actions">
+        <button class="view-more-btn" (click)="toggleExpand(loan)">
+          {{ expandedLoans[getSafeId(loan)] ? 'View Less' : 'View More' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <ng-template #noClosed>
+    <p class="no-loans-text">No closed loans yet.</p>
+  </ng-template>
+</div>
+
+<!-- Bottom navigation -->
+<nav class="bottom-nav">
+  <a routerLink="/home" class="nav-btn">
+    <i class="bi bi-house-door-fill"></i>
+    <span>Home</span>
+  </a>
+  <a routerLink="/viewLoans" class="nav-btn">
+    <i class="bi bi-list-check"></i>
+    <span>Ongoing Loan</span>
+  </a>
+  <a routerLink="/more-Actions" class="nav-btn">
+    <i class="bi bi-archive-fill"></i>
+    <span>More</span>
+  </a>
+</nav>

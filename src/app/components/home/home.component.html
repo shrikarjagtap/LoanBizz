@@ -45,7 +45,7 @@
           <button class="view-more-btn" (click)="toggleDetails(loan)">
             {{ loan.showDetails ? 'Hide Details' : 'View More' }}
           </button>
-          <button class="edit-btn" (click)="goToAddLoanForm()">Edit Loan</button>
+          <!-- <button class="edit-btn" (click)="goToAddLoanForm()">Edit Loan</button> -->
         </div>
 
         <div class="loan-details" *ngIf="loan.showDetails">
@@ -68,7 +68,11 @@
     </a>
     <a routerLink="/viewLoans" class="nav-btn">
       <i class="bi bi-plus-circle-fill"></i>
-      <span>View Ongoing Loans</span>
+      <span>Ongoing Loans</span>
+    </a>
+    <a routerLink="/closedLoans" class="nav-btn">
+      <i class="bi bi-grid-fill"></i>
+      <span>Closed Loans</span>
     </a>
     <a routerLink="/more-Actions" class="nav-btn">
       <i class="bi bi-grid-fill"></i>

@@ -70,4 +70,14 @@ export class ViewLoansComponent implements OnInit {
   trackByLoanId(index: number, loan: Loan): any {
     return loan.loanId;
   }
+
+  closeLoan(loan: Loan) {
+  const confirmClose = confirm(`Are you sure you want to close the loan for "${loan.borrowerName}"?`);
+  if (confirmClose) {
+    this.loanService.closeLoan(loan);
+    this.loans = this.loans.filter(l => l.loanId !== loan.loanId);
+    alert('Loan closed and moved to Closed Loans!');
+  }
+}
+
 }

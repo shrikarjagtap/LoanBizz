@@ -62,28 +62,21 @@ export class HomeComponent implements OnInit {
 
   /** Calculate total principal amount for all ongoing loans */
   calculateTotalDisbursed(): void {
-    this.loanService.getLoans().subscribe({
-      next: (loans: Loan[]) => {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+  this.loanService.getLoans().subscribe({
+    next: (loans: Loan[]) => {
+      // ✅ Now includes all ongoing loans (not filtered by date)
+      this.totalDisbursedAmount = loans.reduce((sum, loan) => {
+        const principal = Number(loan.principalAMT) || 0;
+        return sum + principal;
+      }, 0);
+    },
+    error: err => {
+      console.error('Error fetching loans:', err);
+      this.totalDisbursedAmount = 0;
+    }
+  });
+}
 
-        const ongoingLoans = loans.filter(loan => {
-          const end = new Date(loan.endDate);
-          end.setHours(0, 0, 0, 0);
-          return end >= today;
-        });
-
-        this.totalDisbursedAmount = ongoingLoans.reduce((sum, loan) => {
-          const principal = Number(loan.principalAMT) || 0;
-          return sum + principal;
-        }, 0);
-      },
-      error: err => {
-        console.error('Error fetching loans:', err);
-        this.totalDisbursedAmount = 0;
-      }
-    });
-  }
 
   /** Utility Methods */
   goToAddLoanForm(): void {

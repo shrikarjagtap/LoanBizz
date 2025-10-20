@@ -1,0 +1,164 @@
+/* base container uses the same class name as view-loans so layout matches precisely */
+.view-loans-container {
+  min-height: 100vh;
+  padding: 60px 20px 120px;
+  background: linear-gradient(180deg, #0d0d0d, #1a1a1a); /* same as view-loans */
+  color: #fff;
+  font-family: "Poppins", sans-serif;
+}
+
+/* title same as view loans */
+.page-title {
+  text-align: center;
+  font-weight: 700;
+  color: #00ffc3;
+  margin-bottom: 40px;
+  letter-spacing: 1px;
+  text-shadow: 0 0 10px rgba(0, 255, 195, 0.4);
+}
+
+/* grid - same as view loans */
+.loans-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 25px;
+  align-items: start;
+}
+
+/* loan card - same sizing/shape as view loans; background tweaked for closed */
+.loan-card {
+  border-radius: 18px;
+  padding: 25px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* closed-specific background */
+.loan-card.closed {
+  background: linear-gradient(160deg, #163d2b, #0f6b3e); /* deep green vibe */
+  border: 1px solid rgba(141, 245, 166, 0.12);
+}
+
+/* hover */
+.loan-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 35px rgba(0, 255, 204, 0.15);
+}
+
+/* header & title same look but tuned color */
+.loan-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.loan-header h4 {
+  margin: 0;
+  font-weight: 600;
+  color: #bff5d6; /* lighter green */
+}
+
+/* closed status tag (right side) */
+.status-tag {
+  background: rgba(141, 245, 166, 0.08);
+  color: #bff5d6;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(141, 245, 166, 0.15);
+}
+
+/* delete button placed top-right */
+.delete-btn {
+  background: transparent;
+  border: none;
+  color: #ff4c4c;
+  font-size: 1.1rem;
+  cursor: pointer;
+  margin-left: 8px;
+}
+.delete-btn:hover {
+  color: #ff0000;
+  transform: scale(1.1);
+}
+
+/* info section same layout & typography as view loans */
+.loan-info p {
+  margin: 6px 0;
+  font-size: 0.95rem;
+  color: #e6f7ee;
+}
+.loan-info span {
+  color: #ffd166;
+  font-weight: 500;
+}
+
+/* details section */
+.loan-details {
+  margin-top: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  padding: 12px;
+}
+.loan-details p {
+  margin: 6px 0;
+  color: #dff7e6;
+}
+
+/* actions - keep same feel as view loans buttons */
+.card-actions {
+  margin-top: 14px;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+.view-more-btn {
+  background: linear-gradient(90deg, #00b894, #ff9100);
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 25px;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+.view-more-btn:hover { transform: scale(1.03); }
+
+/* small screens */
+@media (max-width: 576px) {
+  .loan-card {
+    padding: 18px;
+  }
+  .loan-info p, .loan-details p {
+    font-size: 0.9rem;
+  }
+  .page-title { font-size: 1.3rem; }
+}
+
+/* bottom nav (same as view loans) */
+.bottom-nav {
+  position: fixed;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 92%;
+  max-width: 1100px;
+  background: rgba(71, 71, 71, 0.65);
+  backdrop-filter: blur(8px);
+  border-radius: 30px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 10px 12px;
+  z-index: 1000;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+.nav-btn { color: #00ffc3; text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.nav-btn.active { color: #ff9100; }

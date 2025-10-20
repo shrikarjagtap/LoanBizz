@@ -15,7 +15,8 @@ export interface Loan {
   totalTenure?: number;
   showDetails?: boolean;
   isEditing?: boolean;
-  loanId?: number;  // unique ID
+  loanId?: number;
+  isClosed?: boolean; // ✅ NEW FLAG
 }
 
 @Injectable({
@@ -23,20 +24,24 @@ export interface Loan {
 })
 export class LoanService {
   private loansSubject: BehaviorSubject<Loan[]>;
+  private closedLoansSubject: BehaviorSubject<Loan[]>;
 
   constructor() {
-    const storedLoans: Loan[] = this.loadLoansFromStorage();
+    const storedLoans: Loan[] = this.loadLoansFromStorage('loans');
+    const closedLoans: Loan[] = this.loadLoansFromStorage('closedLoans');
+
     this.loansSubject = new BehaviorSubject<Loan[]>(storedLoans);
+    this.closedLoansSubject = new BehaviorSubject<Loan[]>(closedLoans);
   }
 
-  private loadLoansFromStorage(): Loan[] {
+  // ✅ Load from storage (ongoing or closed)
+  private loadLoansFromStorage(key: string): Loan[] {
     if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('loans');
+      const stored = localStorage.getItem(key);
       const loans: Loan[] = stored ? JSON.parse(stored) : [];
       loans.forEach(loan => {
         loan.startDate = new Date(loan.startDate);
         loan.endDate = new Date(loan.endDate);
-        // regenerate loanId on load to ensure uniqueness
         loan.loanId = this.generateLoanId(loan);
       });
       return loans;
@@ -44,29 +49,29 @@ export class LoanService {
     return [];
   }
 
-  private saveLoansToStorage(loans: Loan[]): void {
+  // ✅ Save to storage
+  private saveLoansToStorage(loans: Loan[], key: string): void {
     if (typeof window !== 'undefined') {
-      localStorage.setItem('loans', JSON.stringify(loans));
+      localStorage.setItem(key, JSON.stringify(loans));
     }
   }
 
+  // --- GETTERS ---
   getLoans(): Observable<Loan[]> {
     return this.loansSubject.asObservable();
   }
 
+  getClosedLoans(): Observable<Loan[]> {
+    return this.closedLoansSubject.asObservable();
+  }
+
+  // --- ADD / UPDATE / DELETE ---
   addLoan(loan: Loan): void {
-    loan.loanId = this.generateLoanId(loan); // assign unique ID when adding
+    loan.loanId = this.generateLoanId(loan);
     const current = this.loansSubject.getValue();
     const updated = [...current, loan];
     this.loansSubject.next(updated);
-    this.saveLoansToStorage(updated);
-  }
-
-  deleteLoan(loan: Loan): Observable<boolean> {
-    const updatedLoans = this.loansSubject.value.filter(l => l.loanId !== loan.loanId);
-    this.loansSubject.next(updatedLoans);
-    this.saveLoansToStorage(updatedLoans);
-    return of(true);
+    this.saveLoansToStorage(updated, 'loans');
   }
 
   updateLoan(updatedLoan: Loan): void {
@@ -74,12 +79,33 @@ export class LoanService {
       loan.loanId === updatedLoan.loanId ? updatedLoan : loan
     );
     this.loansSubject.next(loans);
-    this.saveLoansToStorage(loans);
+    this.saveLoansToStorage(loans, 'loans');
   }
 
+  deleteLoan(loan: Loan): Observable<boolean> {
+    const updatedLoans = this.loansSubject.value.filter(l => l.loanId !== loan.loanId);
+    this.loansSubject.next(updatedLoans);
+    this.saveLoansToStorage(updatedLoans, 'loans');
+    return of(true);
+  }
+
+  // ✅ Close Loan (move from active → closed)
+  closeLoan(loan: Loan): void {
+    loan.isClosed = true;
+    const ongoing = this.loansSubject.getValue().filter(l => l.loanId !== loan.loanId);
+    const closed = [...this.closedLoansSubject.getValue(), loan];
+
+    this.loansSubject.next(ongoing);
+    this.closedLoansSubject.next(closed);
+
+    this.saveLoansToStorage(ongoing, 'loans');
+    this.saveLoansToStorage(closed, 'closedLoans');
+  }
+
+  // --- Helper ---
   private generateLoanId(loan: Loan): number {
-    const start = loan.startDate.getTime();
-    const end = loan.endDate.getTime();
+    const start = loan.startDate?.getTime() || 0;
+    const end = loan.endDate?.getTime() || 0;
     const timestamp = Date.now();
     const total = loan.totalAmount || 0;
     return timestamp + (end - start) + total;
