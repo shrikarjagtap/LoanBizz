@@ -1,9 +1,3 @@
-<div class="backBtnDiv">
-    <button type="button" class="btn btn-back btn-outline-dark back-btn ms-4" (click)="goBackToHome()">
-    <i class="bi bi-arrow-left"></i> Home
-</button>
-</div>
-
 <div class="mainContainer">
   <div class="subContainer">
     <div class="section" routerLink="/viewLoans">View Loans</div>
@@ -21,5 +15,24 @@
     <div class="section">View Loans 3</div>
     <div class="section">Loan Actions 3</div>
     <div class="section">Closed Loans 3</div>
-  </div>
+  </div>  
 </div>
+
+ <nav class="bottom-nav">
+    <a routerLink="/home" class="nav-btn">
+      <i class="bi bi-house-door-fill"></i>
+      <span>Home</span>
+    </a>
+    <a routerLink="/viewLoans" class="nav-btn">
+      <i class="bi bi-plus-circle-fill"></i>
+      <span>Ongoing Loans</span>
+    </a>
+    <a routerLink="/closedLoans" class="nav-btn">
+      <i class="bi bi-grid-fill"></i>
+      <span>Closed Loans</span>
+    </a>
+    <a routerLink="/more-Actions" class="nav-btn">
+      <i class="bi bi-grid-fill"></i>
+      <span>More</span>
+    </a>
+  </nav>
