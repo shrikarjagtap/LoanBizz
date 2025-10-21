@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component} from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, OnInit} from '@angular/core';
+import { RouterOutlet, Router } from '@angular/router';
+import { AuthService } from './services/auth.service';
 
 @Component({
   selector: 'app-root',
@@ -9,6 +10,14 @@ import { RouterOutlet } from '@angular/router';
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'LoanbizzV18';
+
+  constructor(private authService: AuthService, private router: Router) {}
+
+  ngOnInit() {
+    // ✅ Force logout on page refresh to always go to login
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
 }

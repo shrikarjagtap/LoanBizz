@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 
 export interface User {
@@ -17,10 +17,12 @@ export class AuthService {
   private currentUser: User | null = null;
 
   constructor(private http: HttpClient) {
-    // ✅ On load, decode stored token if available
-    const token = localStorage.getItem('token');
-    if (token) {
-      this.currentUser = this.decodeToken(token);
+    // ✅ Only access localStorage if running in browser
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('token');
+      if (token) {
+        this.currentUser = this.decodeToken(token);
+      }
     }
   }
 
@@ -29,12 +31,14 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/register`, user);
   }
 
-  // ✅ Login user and save JWT token
+  // ✅ Login and store JWT token
   login(email: string, password: string): Observable<User> {
     return this.http.post<{ token: string }>(`${this.apiUrl}/login`, { email, password }).pipe(
       map(res => {
         if (res.token) {
-          localStorage.setItem('token', res.token);
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('token', res.token);
+          }
           this.currentUser = this.decodeToken(res.token);
           return this.currentUser;
         } else {
@@ -44,28 +48,33 @@ export class AuthService {
     );
   }
 
-  // ✅ Logout and remove token
+  // ✅ Logout
   logout(): void {
     this.currentUser = null;
-    localStorage.removeItem('token');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('token');
+    }
   }
 
-  // ✅ Get logged-in user info
+  // ✅ Get logged-in user
   getCurrentUser(): User | null {
     return this.currentUser;
   }
 
   // ✅ Return stored token (used in LoanService)
   getToken(): string | null {
-    return localStorage.getItem('token');
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('token');
+    }
+    return null;
   }
 
-  // ✅ Check if logged in
+  // ✅ Check login
   isLoggedIn(): boolean {
     return this.currentUser !== null;
   }
 
-  // ✅ Decode token payload to get user info
+  // ✅ Decode JWT payload
   private decodeToken(token: string): User {
     try {
       const payload = token.split('.')[1];
