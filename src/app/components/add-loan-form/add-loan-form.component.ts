@@ -1,23 +1,25 @@
-import { Component } from '@angular/core';
+// src/app/pages/add-loan-form/add-loan-form.component.ts
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Loan, LoanService } from '../../services/loan.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-add-loan-form',
   standalone: true,
-  imports: [CommonModule, FormsModule,RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './add-loan-form.component.html',
   styleUrls: ['./add-loan-form.component.css']
 })
-export class AddLoanFormComponent {
+export class AddLoanFormComponent implements OnInit {
   loan = {
     borrowerName: '',
     borrowerContact: '',
     principalAMT: 0,
     int: 0,
-    totalAmount:0,
+    totalAmount: 0,
     securityAsset: '',
     startDate: '',
     endDate: '',
@@ -26,11 +28,30 @@ export class AddLoanFormComponent {
     investorPercentage: ''
   };
 
-  constructor(private router: Router, private loanService: LoanService) {}
+  constructor(
+    private router: Router,
+    private loanService: LoanService,
+    private authService: AuthService
+  ) {}
+
+  ngOnInit() {
+    // ensure LoanService has current user (so add will work)
+    const user = this.authService.getCurrentUser();
+    if (user && user.email) {
+      this.loanService.setCurrentUser(user.email);
+    } else {
+      alert('❌ User not logged in. Please login again.');
+      this.router.navigate(['/login']);
+    }
+  }
 
   calculateTotal() {
-  this.loan.totalAmount = this.loan.principalAMT + (this.loan.principalAMT * this.loan.int) / 100;
-}
+    if (this.loan.principalAMT && this.loan.int) {
+      this.loan.totalAmount = this.loan.principalAMT + (this.loan.principalAMT * this.loan.int) / 100;
+    } else {
+      this.loan.totalAmount = 0;
+    }
+  }
 
   clearForm() {
     this.loan = {
@@ -38,7 +59,7 @@ export class AddLoanFormComponent {
       borrowerContact: '',
       principalAMT: 0,
       int: 0,
-      totalAmount:0,
+      totalAmount: 0,
       securityAsset: '',
       startDate: '',
       endDate: '',
@@ -48,28 +69,40 @@ export class AddLoanFormComponent {
     };
   }
 
-  onSubmit() {
+  onSubmit(form: NgForm) {
+    if (form.invalid) {
+      alert('❌ Please fill all required fields correctly!');
+      return;
+    }
+
     const newLoan: Loan = {
       borrowerName: this.loan.borrowerName,
       borrowerContact: this.loan.borrowerContact,
-      principalAMT: this.loan.principalAMT,
-      int: this.loan.int,
-      totalAmount: this.loan.totalAmount,
+      principalAMT: Number(this.loan.principalAMT),
+      int: Number(this.loan.int),
+      totalAmount: Number(this.loan.totalAmount),
       securityAsset: this.loan.securityAsset,
       startDate: new Date(this.loan.startDate),
       endDate: new Date(this.loan.endDate),
-      totalTenure: Number(this.loan.totalTenure),
+      totalTenure: this.loan.totalTenure ? Number(this.loan.totalTenure) : undefined,
       investor: this.loan.investor,
-      investorPercentage: Number(this.loan.investorPercentage),
-      showDetails: false
+      investorPercentage: this.loan.investorPercentage ? Number(this.loan.investorPercentage) : undefined,
+      showDetails: false,
+      isClosed: false
     };
 
-    this.loanService.addLoan(newLoan);
-
-    alert('Loan added successfully!');
-    this.clearForm();
-
-    this.router.navigate(['/view-loans']);
+    this.loanService.addLoan(newLoan).subscribe({
+      next: () => {
+        alert('✅ Loan submitted successfully!');
+        form.resetForm();
+        this.clearForm();
+        this.router.navigate(['/viewLoans']);
+      },
+      error: (err) => {
+        console.error('Error adding loan:', err);
+        alert('❌ Failed to submit loan. Please try again.');
+      }
+    });
   }
 
   goBackToHome() {

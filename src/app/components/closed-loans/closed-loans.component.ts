@@ -1,7 +1,8 @@
+// src/app/pages/closed-loans/closed-loans.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Loan, LoanService } from '../../services/loan.service';
 import { RouterLink } from '@angular/router';
+import { Loan, LoanService } from '../../services/loan.service';
 
 @Component({
   selector: 'app-closed-loans',
@@ -17,27 +18,57 @@ export class ClosedLoansComponent implements OnInit {
   constructor(private loanService: LoanService) {}
 
   ngOnInit(): void {
-    this.loanService.getClosedLoans().subscribe(loans => {
-      this.closedLoans = loans.map((loan, idx) => {
-        const normalized = {
-          ...loan,
-          startDate: loan.startDate ? new Date(loan.startDate) : new Date(),
-          endDate: loan.endDate ? new Date(loan.endDate) : new Date(),
-        } as Loan;
-
-        if (!normalized.loanId) {
-          normalized.loanId = Date.now() + idx;
+    // fetch all loans, filter closed ones and normalize
+    try {
+      this.loanService.fetchLoans().subscribe({
+        next: (all) => {
+          // fetchLoans updates the loansSubject (active). To get closed ones, call backend directly:
+          this.loanService.getClosedLoans().subscribe({
+            next: (serverLoans: any[]) => {
+              const closed = (serverLoans || [])
+                .map(s => ({
+                  ...s,
+                  startDate: s.startDate ? new Date(s.startDate) : new Date(),
+                  endDate: s.endDate ? new Date(s.endDate) : new Date(),
+                  loanId: s._id ? s._id.toString() : s.loanId,
+                  isClosed: !!s.isClosed
+                }))
+                .filter(l => l.isClosed);
+              this.closedLoans = closed;
+            },
+            error: (err) => {
+              console.error('Failed to load closed loans', err);
+            }
+          });
+        },
+        error: (err) => {
+          console.error('fetchLoans (in closed) failed', err);
         }
-
-        return normalized;
       });
-    });
+    } catch (e) {
+      // fallback: request closed loans directly
+      this.loanService.getClosedLoans().subscribe({
+        next: (serverLoans: any[]) => {
+          const closed = (serverLoans || [])
+            .map(s => ({
+              ...s,
+              startDate: s.startDate ? new Date(s.startDate) : new Date(),
+              endDate: s.endDate ? new Date(s.endDate) : new Date(),
+              loanId: s._id ? s._id.toString() : s.loanId,
+              isClosed: !!s.isClosed
+            }))
+            .filter(l => l.isClosed);
+          this.closedLoans = closed;
+        },
+        error: (err) => {
+          console.error('Failed to load closed loans', err);
+        }
+      });
+    }
   }
 
   getSafeId(loan: Loan): string {
-    return loan.loanId != null
-      ? loan.loanId.toString()
-      : `${loan.borrowerName}-${loan.startDate?.getTime() ?? ''}`;
+    return loan.loanId != null ? loan.loanId.toString() : `${loan.borrowerName}-${loan.startDate?.getTime() ?? ''}`;
   }
 
   toggleExpand(loan: Loan): void {
@@ -48,17 +79,20 @@ export class ClosedLoansComponent implements OnInit {
   deleteClosedLoan(loan: Loan): void {
     const confirmed = confirm(`Permanently delete closed loan for "${loan.borrowerName}"?`);
     if (!confirmed) return;
-
-    // Remove from local display array
-    this.closedLoans = this.closedLoans.filter(l => l.loanId !== loan.loanId);
-
-    // Persist to localStorage
-    try {
-      localStorage.setItem('closedLoans', JSON.stringify(this.closedLoans));
-    } catch (e) {
-      console.error('Failed to persist closedLoans to localStorage', e);
+    if (!loan.loanId) {
+      console.error('Loan ID not found');
+      alert('Cannot delete loan — ID missing.');
+      return;
     }
-
-    alert('Closed loan deleted permanently.');
+    this.loanService.deleteLoan(loan).subscribe({
+      next: () => {
+        this.closedLoans = this.closedLoans.filter(l => l.loanId !== loan.loanId);
+        alert('Closed loan deleted permanently.');
+      },
+      error: (err) => {
+        console.error('Failed to delete closed loan', err);
+        alert('Failed to delete closed loan. Try again.');
+      }
+    });
   }
 }

@@ -15,22 +15,34 @@ import { LoanService } from '../../services/loan.service';
 export class LoginComponent {
   email: string = '';
   password: string = '';
+  isLoading: boolean = false;
 
   constructor(
     private authService: AuthService,
     private loanService: LoanService,
-    private router: Router) {}
+    private router: Router
+  ) {}
 
   loginUser(): void {
-    const user: User | null = this.authService.login(this.email, this.password);
-    if (user) {
-      // ✅ Set current user in LoanService so loans are scoped per user
-      this.loanService.setCurrentUser(user.email);
+    this.isLoading = true;
 
-      // alert('Login successful!');
-      this.router.navigate(['/home']); // redirect to home page
-    } else {
-      alert('Invalid Gmail or password');
-    }
+    this.authService.login(this.email, this.password).subscribe({
+      next: (user: User) => {
+        this.isLoading = false;
+
+        if (user && user.email) {
+          this.loanService.setCurrentUser(user.email);
+          alert('✅ Login successful!');
+          this.router.navigate(['/home']);
+        } else {
+          alert('❌ Invalid Gmail or password');
+        }
+      },
+      error: (err) => {
+        this.isLoading = false;
+        console.error('Login failed:', err);
+        alert('❌ Invalid Gmail or password');
+      }
+    });
   }
 }

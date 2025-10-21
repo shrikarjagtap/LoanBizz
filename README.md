@@ -25,3 +25,20 @@ Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To u
 ## Further help
 
 To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+
+BACKEND:
+npm install express mongoose cors dotenv body-parser bcryptjs
+Explanation:
+
+express → server
+
+mongoose → connect to MongoDB
+
+cors → allow Angular to talk to backend
+
+dotenv → store secrets like DB link safely
+
+body-parser → read POST request body
+
+bcryptjs → encrypt passwords

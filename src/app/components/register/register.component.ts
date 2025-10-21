@@ -18,34 +18,46 @@ export class RegisterComponent {
   password: string = '';
   confirmPassword: string = '';
 
+  isLoading: boolean = false;
+
   constructor(private authService: AuthService, private router: Router) {}
 
   registerUser(): void {
-    // password validation
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
     if (!passwordRegex.test(this.password)) {
-      alert('Password must contain at least 8 chars, 1 uppercase, 1 lowercase, 1 digit, 1 special char');
+      alert('Password must contain at least 8 characters, including uppercase, lowercase, number, and special character.');
       return;
     }
 
     if (this.password !== this.confirmPassword) {
-      alert('Passwords do not match');
+      alert('Passwords do not match!');
       return;
     }
 
-    const registered = this.authService.register({
-      name: this.name,
-      phone: this.phone,
-      email: this.gmail,
-      password: this.password
-    });
+    this.isLoading = true;
 
-    if (!registered) {
-      alert('Gmail already registered!');
-      return;
-    }
-
-    alert('Registration successful! Please login.');
-    this.router.navigate(['/login']);
+    this.authService
+      .register({
+        name: this.name,
+        phone: this.phone,
+        email: this.gmail,
+        password: this.password
+      })
+      .subscribe({
+        next: () => {
+          this.isLoading = false;
+          alert('✅ Registration successful! Please login.');
+          this.router.navigate(['/login']);
+        },
+        error: (err) => {
+          this.isLoading = false;
+          console.error(err);
+          if (err.status === 409) {
+            alert('Email already registered!');
+          } else {
+            alert('Registration failed. Try again.');
+          }
+        }
+      });
   }
 }

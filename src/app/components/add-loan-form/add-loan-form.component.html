@@ -13,7 +13,7 @@
   </div>
 
   <div class="form-card shadow-sm p-4 rounded-4 bg-white">
-    <form #loanForm="ngForm" (ngSubmit)="onSubmit()" novalidate>
+    <form #loanForm="ngForm" (ngSubmit)="onSubmit(loanForm)" novalidate>
       <div class="row g-3">
         <div class="col-md-6">
           <label class="form-label">Borrower Name <span class="text-danger">*</span></label>

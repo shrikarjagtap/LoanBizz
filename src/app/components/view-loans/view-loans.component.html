@@ -48,7 +48,7 @@
           {{ loan.showDetails ? 'Hide Details' : 'View More' }}
         </button>
         <button class="view-more-btn" (click)="editLoan(loan)">Edit Loan</button>
-         <button class="view-more-btn close" (click)="closeLoan(loan)">Close Loan</button>
+        <button class="view-more-btn close" (click)="closeLoan(loan)">Close Loan</button>
       </div>
 
       <div *ngIf="loan.isEditing">
