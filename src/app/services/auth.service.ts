@@ -13,7 +13,7 @@ export interface User {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:5000/api';
+  private apiUrl = 'https://loanbizz-server.onrender.com/';
   private currentUser: User | null = null;
 
   constructor(private http: HttpClient) {
