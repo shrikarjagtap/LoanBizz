@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface User {
   name: string;
@@ -13,7 +14,7 @@ export interface User {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'https://loanbizz-server.onrender.com/api';
+  private apiUrl = environment.apiUrl;
   private currentUser: User | null = null;
 
   constructor(private http: HttpClient) {

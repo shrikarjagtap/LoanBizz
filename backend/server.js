@@ -6,22 +6,29 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const path = require('path'); // ✅ For serving Angular build in production
+require('dotenv').config(); // ✅ For environment variables
 
 const app = express();
-const PORT = 5000;
-const SECRET_KEY = 'your_secret_key_here'; // ⚠️ Use .env in production!
+
+// ===== PORT & SECRET_KEY =====
+// Use environment variables for deployment; fallback to local values
+const PORT = process.env.PORT || 5000;
+const SECRET_KEY = process.env.SECRET_KEY || 'fallback_secret_key';
 
 // ===== Middleware =====
 app.use(
   cors({
-    origin: 'http://localhost:4200', // Allow Angular app
+    origin: '*', // ✅ Allow all origins for now; replace with frontend URL in production
     credentials: true,
   })
 );
 app.use(bodyParser.json());
 
 // ===== MongoDB Connection =====
+// Use environment variable if available
 const mongoURI =
+  process.env.MONGO_URI ||
   'mongodb+srv://shrikarjagtap2_db_user:shrikar0707@loanbizzcluster.cceh8an.mongodb.net/?retryWrites=true&w=majority&appName=LoanBizzCluster';
 
 mongoose
@@ -50,7 +57,7 @@ const loanSchema = new mongoose.Schema({
   investorPercentage: Number,
   totalTenure: Number,
   isClosed: { type: Boolean, default: false },
-  userEmail: String, // linked to user's email
+  userEmail: String,
 });
 
 const User = mongoose.model('User', userSchema);
@@ -65,7 +72,7 @@ function verifyToken(req, res, next) {
   try {
     const token = authHeader.replace('Bearer ', '');
     const decoded = jwt.verify(token, SECRET_KEY);
-    req.user = decoded; // user info from token
+    req.user = decoded; // ✅ user info from token
     next();
   } catch (err) {
     return res.status(401).json({ message: 'Invalid or expired token.' });
@@ -110,7 +117,6 @@ app.post('/api/login', async (req, res) => {
     if (!validPass)
       return res.status(401).json({ message: 'Invalid credentials' });
 
-    // Generate JWT
     const token = jwt.sign(
       { name: user.name, email: user.email, phone: user.phone },
       SECRET_KEY,
@@ -128,15 +134,10 @@ app.post('/api/login', async (req, res) => {
 app.post('/api/loans', verifyToken, async (req, res) => {
   try {
     const loanData = req.body;
-
-    // Validate minimum fields
     if (!loanData.borrowerName || !loanData.startDate || !loanData.endDate) {
-      return res
-        .status(400)
-        .json({ message: 'Missing required loan fields' });
+      return res.status(400).json({ message: 'Missing required loan fields' });
     }
 
-    // Add user's email from token if not provided
     if (!loanData.userEmail) loanData.userEmail = req.user.email;
 
     const loan = new Loan(loanData);
@@ -148,12 +149,10 @@ app.post('/api/loans', verifyToken, async (req, res) => {
   }
 });
 
-// ----- GET all Loans for Logged-in User (Protected) -----
+// ----- GET Loans for Logged-in User -----
 app.get('/api/loans/:userEmail', verifyToken, async (req, res) => {
   try {
     const { userEmail } = req.params;
-
-    // Only allow user to access their own loans
     if (req.user.email !== userEmail)
       return res.status(403).json({ message: 'Forbidden' });
 
@@ -165,7 +164,7 @@ app.get('/api/loans/:userEmail', verifyToken, async (req, res) => {
   }
 });
 
-// ----- DELETE Loan (Protected) -----
+// ----- DELETE Loan -----
 app.delete('/api/loans/:id', verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
@@ -177,6 +176,7 @@ app.delete('/api/loans/:id', verifyToken, async (req, res) => {
   }
 });
 
+// ----- UPDATE Loan -----
 app.put('/api/loans/:id', verifyToken, async (req, res) => {
   try {
     const { id } = req.params;
@@ -193,8 +193,14 @@ app.put('/api/loans/:id', verifyToken, async (req, res) => {
 });
 
 // ----- Health Check -----
-app.get('/', (req, res) => {
+app.get('/api/health', (req, res) => {
   res.send('✅ LoanBizz Backend is running successfully!');
+});
+
+// ===== Serve Angular Build in Production =====
+app.use(express.static(path.join(__dirname, 'dist/LoanBizzV18')));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist/LoanBizzV18/index.html'));
 });
 
 // ===== Start Server =====

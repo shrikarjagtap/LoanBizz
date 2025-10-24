@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable, throwError } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { tap, catchError } from 'rxjs/operators';
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
 
 export interface Loan {
   borrowerName: string;
@@ -30,7 +31,7 @@ export interface Loan {
 export class LoanService {
   private loansSubject = new BehaviorSubject<Loan[]>([]);
   private currentUserEmail: string | null = null;
-  private apiUrl = 'https://loanbizz-server.onrender.com/api';
+  private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
