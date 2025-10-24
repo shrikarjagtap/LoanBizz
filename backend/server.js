@@ -199,7 +199,7 @@ app.get('/api/health', (req, res) => {
 
 // ===== Serve Angular Build in Production =====
 app.use(express.static(path.join(__dirname, 'dist/LoanBizzV18')));
-app.get('/*', (req, res) => {
+app.get(/^\/(?!api).*/, (req, res) => {
   res.sendFile(path.join(__dirname, 'dist/LoanBizzV18/index.html'));
 });
 
