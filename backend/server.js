@@ -14,7 +14,7 @@ const SECRET_KEY = 'your_secret_key_here'; // ⚠️ Use .env in production!
 // ===== Middleware =====
 app.use(
   cors({
-    origin: ['http://localhost:4200','loan-bizz-3wsd.vercel.app'], // Allow Angular app
+    origin: 'https://loan-bizz-3wsd.vercel.app', // Allow Angular app
     credentials: true,
   })
 );
