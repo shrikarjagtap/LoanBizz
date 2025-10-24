@@ -14,7 +14,7 @@ export interface User {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'https://loanbizz-server.onrender.com';
+  private apiUrl = 'https://loanbizz-server.onrender.com/api';
   private currentUser: User | null = null;
 
   constructor(private http: HttpClient) {

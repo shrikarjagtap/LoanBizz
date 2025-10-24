@@ -31,7 +31,7 @@ export interface Loan {
 export class LoanService {
   private loansSubject = new BehaviorSubject<Loan[]>([]);
   private currentUserEmail: string | null = null;
-  private apiUrl = 'https://loanbizz-server.onrender.com';
+  private apiUrl = 'https://loanbizz-server.onrender.com/api';
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
