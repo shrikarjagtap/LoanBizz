@@ -10,7 +10,7 @@ const { get } = require('http');
 
 const app = express();
 const PORT = 5000;
-const SECRET_KEY = SECRET_KEY; // ⚠️ Use .env in production!
+const SECRET_KEY = 'SECRET_KEY'; // ⚠️ Use .env in production!
 
 // ===== Middleware =====
 app.use(
