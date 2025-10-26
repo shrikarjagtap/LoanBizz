@@ -6,15 +6,21 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const { get } = require('http');
 
 const app = express();
 const PORT = 5000;
-const SECRET_KEY = 'your_secret_key_here'; // ⚠️ Use .env in production!
+const SECRET_KEY = SECRET_KEY; // ⚠️ Use .env in production!
 
 // ===== Middleware =====
 app.use(
   cors({
-    origin: 'https://loan-bizz-3wsd.vercel.app', // Allow Angular app
+    origin: [
+      'https://loan-bizz-3wsd.vercel.app',
+      'http://localhost:4200'
+    ],
+    methods:['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   })
 );

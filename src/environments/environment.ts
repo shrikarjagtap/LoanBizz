@@ -1,4 +1,6 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:5000/api'  // your local backend
+  apiUrl: 'https://loanbizz-server.onrender.com/api'  // your local backend
 };
+
+// http://localhost:5000/api
