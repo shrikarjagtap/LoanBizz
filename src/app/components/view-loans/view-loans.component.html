@@ -1,8 +1,18 @@
 <div class="view-loans-container">
   <h2 class="page-title">Ongoing Loans</h2>
 
-  <div class="loans-grid" *ngIf="loans && loans.length > 0; else noLoans">
-    <div class="loan-card" *ngFor="let loan of loans; trackBy: trackByLoanId" [ngClass]="{'editing': loan.isEditing}">
+  <div class="search-container">
+    <input
+      type="text"
+      placeholder="🔍 Search by name, amount, or date..."
+      [(ngModel)]="searchTerm"
+      (input)="onSearch()"
+      class="search-input"
+    />
+  </div>
+
+  <div class="loans-grid" *ngIf="loans && filteredLoans.length > 0; else noLoans">
+    <div class="loan-card" *ngFor="let loan of filteredLoans; trackBy: trackByLoanId" [ngClass]="{'editing': loan.isEditing}">
 
       <!-- Header -->
       <div class="loan-header">

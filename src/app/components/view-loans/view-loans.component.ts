@@ -14,29 +14,49 @@ import { FormsModule } from '@angular/forms';
 })
 export class ViewLoansComponent implements OnInit {
   loans: Loan[] = [];
+  filteredLoans: Loan[] = []; // ✅ for search filtering
+  searchTerm: string = ''; // ✅ user’s search input
   private backupLoan: { [key: string]: Loan } = {}; // backup by loanId
 
   constructor(private loanService: LoanService, private router: Router) {}
 
-  ngOnInit(): void {
-    // ensure server list is fetched, then subscribe to subject
-    // if setCurrentUser() already called on login, fetchLoans will succeed
+   ngOnInit(): void {
     try {
       this.loanService.fetchLoans().subscribe({
         next: () => {
-          this.loanService.getLoans().subscribe((loans) => (this.loans = loans));
+          this.loanService.getLoans().subscribe((loans) => {
+            this.loans = loans;
+            this.filteredLoans = loans; // ✅ initialize filteredLoans
+          });
         },
         error: (err) => {
           console.error('Failed to fetch loans on init', err);
-          // still subscribe to subject in case service has value
-          this.loanService.getLoans().subscribe((loans) => (this.loans = loans));
+          this.loanService.getLoans().subscribe((loans) => {
+            this.loans = loans;
+            this.filteredLoans = loans; // ✅ fallback
+          });
         }
       });
     } catch (e) {
-      // user not set; still subscribe in case
-      this.loanService.getLoans().subscribe((loans) => (this.loans = loans));
+      this.loanService.getLoans().subscribe((loans) => {
+        this.loans = loans;
+        this.filteredLoans = loans; // ✅ fallback
+      });
     }
   }
+
+   onSearch(): void {
+    const term = this.searchTerm.toLowerCase();
+    this.filteredLoans = this.loans.filter((loan) =>
+      loan.borrowerName?.toLowerCase().includes(term) ||
+      loan.principalAMT?.toString().includes(term) ||
+      loan.totalAmount?.toString().includes(term) ||
+      loan.startDate?.toString().includes(term) ||
+      loan.endDate?.toString().includes(term)
+    );
+  }
+
+
 
   toggleDetails(loan: Loan) {
     loan.showDetails = !loan.showDetails;
@@ -54,6 +74,7 @@ export class ViewLoansComponent implements OnInit {
       next: () => {
         // subject will refresh; still update local for immediate UX
         this.loans = this.loans.filter(l => l.loanId !== loan.loanId);
+        this.filteredLoans = this.filteredLoans.filter(l => l.loanId !== loan.loanId); // ✅ update filtered list
         alert('Loan deleted successfully!');
       },
       error: (err) => {
