@@ -49,7 +49,7 @@
   max-width: 150px;
   padding: 10px 15px;
   border-radius: 25px;
-  background: #898888;
+  background: #111;
   font-size: 1rem;
   color: #fff;
   transition: 0.3s ease;
@@ -82,7 +82,7 @@
 /* Native calendar styling for dark theme */
 input[type="date"] {
   color-scheme: dark;
-  background-color: #898888;
+  background-color: #111;
   color: #fff;
   border: none;
 }
