@@ -16,6 +16,7 @@ export class ViewLoansComponent implements OnInit {
   loans: Loan[] = [];
   filteredLoans: Loan[] = []; // ✅ for search filtering
   searchTerm: string = ''; // ✅ user’s search input
+  selectedDate: string = ''; // ✅ for date filtering
   private backupLoan: { [key: string]: Loan } = {}; // backup by loanId
 
   constructor(private loanService: LoanService, private router: Router) {}
@@ -47,14 +48,31 @@ export class ViewLoansComponent implements OnInit {
 
    onSearch(): void {
     const term = this.searchTerm.toLowerCase();
-    this.filteredLoans = this.loans.filter((loan) =>
-      loan.borrowerName?.toLowerCase().includes(term) ||
-      loan.principalAMT?.toString().includes(term) ||
-      loan.totalAmount?.toString().includes(term) ||
-      loan.startDate?.toString().includes(term) ||
-      loan.endDate?.toString().includes(term)
-    );
+    const selected = this.selectedDate ? new Date(this.selectedDate).toDateString() : null;
+
+    this.filteredLoans = this.loans.filter((loan) => {
+      const matchesText =
+        loan.borrowerName?.toLowerCase().includes(term) ||
+        loan.principalAMT?.toString().includes(term) ||
+        loan.totalAmount?.toString().includes(term);
+
+      const matchesDate =
+        selected &&
+        (new Date(loan.startDate).toDateString() === selected ||
+         new Date(loan.endDate).toDateString() === selected);
+
+      // ✅ Keep both text and date search working together
+      if (term && selected) return matchesText && matchesDate;
+      if (term) return matchesText;
+      if (selected) return matchesDate;
+      return true;
+    });
   }
+
+  onDateChange(): void {
+    this.onSearch(); // ✅ re-filter whenever date changes
+  }
+
 
 
 

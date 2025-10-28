@@ -2,13 +2,23 @@
   <h2 class="page-title">Ongoing Loans</h2>
 
   <div class="search-container">
-    <input
-      type="text"
-      placeholder="🔍 Search by name, amount, or date..."
-      [(ngModel)]="searchTerm"
-      (input)="onSearch()"
-      class="search-input"
-    />
+    <div class="search-wrapper">
+      <input
+        type="text"
+        placeholder="🔍 Search by name, amount, or date..."
+        [(ngModel)]="searchTerm"
+        (input)="onSearch()"
+        class="search-input"
+      />
+
+      <!-- 📅 Date Picker beside Search -->
+      <input
+        type="date"
+        [(ngModel)]="selectedDate"
+        (change)="onDateChange()"
+        class="date-input"
+      />
+    </div>
   </div>
 
   <div class="loans-grid" *ngIf="loans && filteredLoans.length > 0; else noLoans">

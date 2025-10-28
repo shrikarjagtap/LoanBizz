@@ -17,6 +17,81 @@
   text-shadow: 0 0 10px rgba(0, 255, 195, 0.4);
 }
 
+/* ✅ Search Section */
+.search-container {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.search-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.search-input{
+  width: 42%;
+  min-width: 150px;
+  max-width: 300px;
+  padding: 10px 15px;
+  border-radius: 25px;
+  background: #111;
+  font-size: 1rem;
+  color: #fff;
+  transition: 0.3s ease;
+}
+
+.date-input {
+  width: 25%;
+  min-width: 100px;
+  max-width: 150px;
+  padding: 10px 15px;
+  border-radius: 25px;
+  background: #898888;
+  font-size: 1rem;
+  color: #fff;
+  transition: 0.3s ease;
+}
+
+/* 🔍 Text Search Styling */
+.search-input {
+  border: 2px solid #00ffc3;
+}
+
+.search-input:focus {
+  outline: none;
+  box-shadow: 0 0 12px #00ffc3;
+  border-color: #ff9100;
+}
+
+/* 📅 Date Search Styling */
+.date-input {
+  border: 2px solid #ff9100;
+  cursor: pointer;
+}
+
+.date-input:hover,
+.date-input:focus {
+  outline: none;
+  box-shadow: 0 0 10px #ff9100;
+  border-color: #00ffc3;
+}
+
+/* Native calendar styling for dark theme */
+input[type="date"] {
+  color-scheme: dark;
+  background-color: #898888;
+  color: #fff;
+  border: none;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+}
+
 /* 🧱 Loan Cards Grid */
 .loans-grid {
   display: grid;
@@ -155,24 +230,7 @@
   text-shadow: 0 0 10px rgba(255, 145, 0, 0.6);
 }
 
-/* 📱 Responsive Design */
-@media (max-width: 576px) {
-  .loan-card {
-    padding: 18px;
-  }
-  .loan-info p,
-  .loan-details p {
-    font-size: 0.9rem;
-  }
-  .page-title {
-    font-size: 1.3rem;
-  }
-  /* .nav-btn span {
-    display: none; 
-  } */
-}
-
-
+/* 🗑️ Delete Button */
 .delete-btn {
   position: absolute;
   top: 12px;
@@ -190,10 +248,7 @@
   transform: scale(1.2);
 }
 
-
 /* ===== EDIT FEATURE STYLING ===== */
-
-/* Edit button inside each card */
 .loan-card .edit-btn {
   background-color: #0078d7;
   color: white;
@@ -210,7 +265,6 @@
   transform: scale(1.05);
 }
 
-/* Save and Cancel buttons */
 .edit-actions {
   display: flex;
   gap: 10px;
@@ -266,7 +320,7 @@
   box-shadow: 0 0 5px rgba(0, 120, 215, 0.4);
 }
 
-/* Edit section layout */
+/* Edit section animation */
 .edit-section {
   background-color: #f8faff;
   padding: 10px;
@@ -275,14 +329,6 @@
   border: 1px solid #d0e3ff;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease-in-out;
-}
-
-.edit-section:hover {
-  box-shadow: 0 4px 10px rgba(0, 120, 215, 0.15);
-}
-
-/* For smoother show/hide effect */
-.edit-section {
   opacity: 0;
   transform: translateY(-5px);
   animation: fadeInEdit 0.3s forwards;
@@ -295,33 +341,29 @@
   }
 }
 
-.loan-card.editing .delete-btn {
-  display: none;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.25s ease-in-out;
-}
+/* 📱 Responsive Design */
+@media (max-width: 576px) {
+  .search-wrapper {
+    flex-direction: column;
+    gap: 10px;
+  }
 
-/* ✅ Search Bar */
-.search-container {
-  text-align: center;
-  margin-bottom: 25px;
-}
+  .search-input,
+  .date-input {
+    width: 90%;
+    max-width: none;
+  }
 
-.search-input {
-  width: 90%;
-  max-width: 400px;
-  padding: 10px 15px;
-  border-radius: 25px;
-  border: 2px solid #00ffc3;
-  background: #111;
-  color: #fff;
-  font-size: 1rem;
-  transition: 0.3s ease;
-}
+  .loan-card {
+    padding: 18px;
+  }
 
-.search-input:focus {
-  outline: none;
-  box-shadow: 0 0 12px #00ffc3;
-  border-color: #ff9100;
+  .loan-info p,
+  .loan-details p {
+    font-size: 0.9rem;
+  }
+
+  .page-title {
+    font-size: 1.3rem;
+  }
 }
