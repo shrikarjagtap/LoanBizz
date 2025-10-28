@@ -367,3 +367,33 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     font-size: 1.3rem;
   }
 }
+
+/* 📱 Mobile Date Input */
+@media (max-width: 768px) {
+  input[type="date"] {
+    background-color: #222 !important;
+    color: #fff !important;
+    border: 2px solid #ff9100 !important;
+    border-radius: 25px;
+    padding: 10px 15px !important;
+    width: 90%;
+    font-size: 1rem;
+  }
+
+  /* Make the calendar icon visible */
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    opacity: 1 !important;
+  }
+
+  /* Ensure placeholder text is visible */
+  input[type="date"]::placeholder {
+    color: #ccc !important;
+    opacity: 1 !important;
+  }
+
+  /* iPhone-specific tweak */
+  input[type="date"]::-webkit-datetime-edit {
+    color: #fff !important;
+  }
+}
