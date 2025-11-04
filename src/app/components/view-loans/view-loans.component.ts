@@ -9,6 +9,19 @@ import { FormsModule } from '@angular/forms';
   selector: 'app-view-loans',
   standalone: true,
   imports: [CommonModule, RouterLink, FormsModule],
+  template:`
+  <div class="search-wrapper">
+    <input type="text" placeholder="Search..." [(ngModel)]="searchTerm" (input)="onSearch()">
+    <input type="text"
+           placeholder="📅 Select date"
+           mwlFlatpickr
+           [altInput]="true"
+           [altFormat]="'d M Y'"
+           [dateFormat]="'Y-m-d'"
+           [(ngModel)]="selectedDate"
+           (change)="onDateSelect()"/>
+  </div>
+  `,
   templateUrl: './view-loans.component.html',
   styleUrls: ['./view-loans.component.css']
 })
@@ -46,6 +59,11 @@ export class ViewLoansComponent implements OnInit {
     }
   }
 
+  
+  onDateSelect() {
+    console.log(this.selectedDate);
+    // your filter logic
+  }
    onSearch(): void {
     const term = this.searchTerm.toLowerCase();
     const selected = this.selectedDate ? new Date(this.selectedDate).toDateString() : null;
