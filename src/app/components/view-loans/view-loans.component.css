@@ -397,24 +397,3 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     color: #fff !important;
   }
 }
-
-.date-label {
-  position: relative;
-  display: inline-block;
-}
-
-.date-placeholder {
-  position: absolute;
-  top: 50%;
-  left: 15px;
-  transform: translateY(-50%);
-  color: #999;
-  pointer-events: none;
-  font-size: 0.95rem;
-}
-
-.date-input:focus + .date-placeholder,
-.date-input:not(:placeholder-shown) + .date-placeholder {
-  display: none;
-}
-

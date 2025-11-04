@@ -12,15 +12,13 @@
       />
 
       <!-- 📅 Date Picker beside Search -->
-       <label class="date-label">
       <input
+       placeholder="📅 Select date"
         type="date"
         [(ngModel)]="selectedDate"
-        (change)="onDateSelect()"
+        (change)="onDateChange()"
         class="date-input"
       />
-      <span class="date-placeholder">📅 Select date</span>
-      </label>
     </div>
   </div>
 
