@@ -31,7 +31,7 @@ export class LoginComponent {
         this.isLoading = false;
 
         if (user && user.email) {
-          this.loanService.setCurrentUser(user.email);
+          // this.loanService.setCurrentUser(user.email);
           alert('✅ Login successful!');
           this.router.navigate(['/home']);
         } else {

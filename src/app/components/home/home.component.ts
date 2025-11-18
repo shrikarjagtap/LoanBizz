@@ -26,10 +26,13 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
      this.currentUser = this.authService.getCurrentUser(); // ✅ Get current user
+
     if (!this.currentUser) {
       this.router.navigate(['/login']); // redirect if not logged in
       return;
     }
+
+    this.loanService.fetchLoans().subscribe();
 
     this.loadUpcomingLoans();
   }
