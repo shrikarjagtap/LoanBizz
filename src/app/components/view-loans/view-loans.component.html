@@ -25,13 +25,13 @@
   <div class="loans-grid" *ngIf="loans && filteredLoans.length > 0; else noLoans">
     <div class="loan-card" *ngFor="let loan of filteredLoans; trackBy: trackByLoanId" [ngClass]="{'editing': loan.isEditing}">
 
+      <button class="delete-btn" (click)="deleteLoan(loan)" title="Delete Loan">
+          <i class="bi bi-trash-fill"></i> Delete
+        </button>
       <!-- Header -->
       <div class="loan-header">
         <h4 *ngIf="!loan.isEditing">{{ loan.borrowerName }}</h4>
         <input *ngIf="loan.isEditing" [(ngModel)]="loan.borrowerName" placeholder="Borrower Name" />
-        <button class="delete-btn" (click)="deleteLoan(loan)" title="Delete Loan">
-          <i class="bi bi-trash-fill"></i> delete
-        </button>
       </div>
 
       <!-- Loan Info -->
@@ -49,6 +49,8 @@
         <input type="number" [(ngModel)]="loan.principalAMT" />
         <label>Interest (%):</label>
         <input type="number" [(ngModel)]="loan.int" />
+        <label>Total Amount (%):</label>
+        <input type="number" [(ngModel)]="loan.totalAmount" />
         <label>End Date:</label>
         <input type="date" [(ngModel)]="loan.endDate" />
         <label>Borrower Contact:</label>

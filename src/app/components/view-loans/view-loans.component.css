@@ -119,10 +119,19 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 /* 💬 Card Header */
+.loan-header {
+  position: relative;
+  padding-right: 60px;  /* space for delete button */
+}
+
 .loan-header h4 {
-  margin: 0 0 15px 0;
+  margin: 0px 0px 15px 0;
   font-weight: 600;
   color: #00ffc3;
+  word-break: break-word;   /* ensures long names wrap instead of overflowing */
+  white-space: normal;
+  /* font-size: 1rem; */
+  padding: 0px 5px 0px 0px;
 }
 
 /* 🧾 Info Lines */
@@ -233,14 +242,17 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 /* 🗑️ Delete Button */
 .delete-btn {
   position: absolute;
-  top: 12px;
-  right: 15px;
+  top: 0px;
+  right: 0px;
   background: transparent;
   border: none;
   color: #ff4c4c;
   font-size: 1.3rem;
   cursor: pointer;
   transition: all 0.3s ease;
+  padding: 5px;
+  z-index: 10;
+  margin: 1px 14px 0px 0px
 }
 
 .delete-btn:hover {
