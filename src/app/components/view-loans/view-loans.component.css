@@ -411,5 +411,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .date-input:not(:invalid)::before {
   content: "";
 }
+}
 
+@media (max-width: 769px) {
+  .date-input:invalid::before {
+    content: "";
+  }
 }
