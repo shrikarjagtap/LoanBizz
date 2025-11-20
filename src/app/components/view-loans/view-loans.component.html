@@ -12,13 +12,24 @@
       />
 
       <!-- 📅 Date Picker beside Search -->
-      <input
+      <!-- <input
        placeholder="📅 Select date"
         type="date"
         [(ngModel)]="selectedDate"
         (change)="onDateChange()"
         class="date-input"
+      /> -->
+
+      <input
+        type="date"
+        placeholder="📅 Select date"
+        [(ngModel)]="selectedDate"
+        (change)="onDateChange()"
+        class="date-input"
+        required
+        value=""
       />
+
     </div>
   </div>
 

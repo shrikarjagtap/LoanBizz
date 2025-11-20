@@ -393,17 +393,23 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     font-size: 1rem;
   }
 
-  input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(1);
-    opacity: 1 !important;
-  }
+ .date-input:invalid::before {
+  content: attr(placeholder);
+  color: #ccc;
+  font-size: 1rem;
+  position: absolute;
+  pointer-events: none;
+  margin-left: 10px;
+}
 
-  input[type="date"]::placeholder {
-    color: #ccc !important;
-    opacity: 1 !important;
-  }
+/* For proper positioning */
+.date-input {
+  position: relative;
+}
 
-  input[type="date"]::-webkit-datetime-edit {
-    color: #fff !important;
-  }
+/* Remove placeholder when user selects date */
+.date-input:not(:invalid)::before {
+  content: "";
+}
+
 }
