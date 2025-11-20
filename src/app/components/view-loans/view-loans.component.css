@@ -124,17 +124,18 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   padding-right: 60px;  /* space for delete button */
 }
 
+/* FIX FOR ISSUE 2 */
 .loan-header h4 {
   margin: 0px 0px 15px 0;
   font-weight: 600;
   color: #00ffc3;
-  word-break: break-word;   /* ensures long names wrap instead of overflowing */
-  white-space: normal;
-  /* font-size: 1rem; */
-  padding: 0px 5px 0px 0px;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.2;
+  max-height: 2.8em;       /* limits to 2 lines */
+  font-size: clamp(0.85rem, 2.5vw, 1.05rem);  /* auto resize */
 }
 
-/* 🧾 Info Lines */
 .loan-info p {
   margin: 4px 0;
   font-size: 0.95rem;
@@ -392,19 +393,16 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     font-size: 1rem;
   }
 
-  /* Make the calendar icon visible */
   input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(1);
     opacity: 1 !important;
   }
 
-  /* Ensure placeholder text is visible */
   input[type="date"]::placeholder {
     color: #ccc !important;
     opacity: 1 !important;
   }
 
-  /* iPhone-specific tweak */
   input[type="date"]::-webkit-datetime-edit {
     color: #fff !important;
   }
