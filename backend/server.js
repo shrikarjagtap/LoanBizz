@@ -11,7 +11,6 @@ const { get } = require('http');
 const app = express();
 const PORT = 5000;
 const SECRET_KEY = 'SECRET_KEY'; // ⚠️ Use .env in production!
-const SALT_ROUNDS = 8; // was 10 → slightly faster hashing
 
 // ===== Middleware =====
 app.use(
@@ -21,7 +20,7 @@ app.use(
       'http://localhost:4200',
       'http://192.168.1.134:4200'
     ],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    methods:['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   })
@@ -32,18 +31,8 @@ app.use(bodyParser.json());
 const mongoURI =
   'mongodb+srv://shrikarjagtap2_db_user:shrikar0707@loanbizzcluster.cceh8an.mongodb.net/?retryWrites=true&w=majority&appName=LoanBizzCluster';
 
-// Optional: remove deprecation warnings
-mongoose.set('strictQuery', false);
-
 mongoose
-  .connect(mongoURI, {
-    dbName: 'loanbizz',            // choose a specific DB name
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    maxPoolSize: 10,               // connection pool
-    serverSelectionTimeoutMS: 5000,
-    socketTimeoutMS: 45000,
-  })
+  .connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('✅ MongoDB connected successfully'))
   .catch((err) => console.error('❌ MongoDB connection error:', err));
 
@@ -51,12 +40,9 @@ mongoose
 const userSchema = new mongoose.Schema({
   name: String,
   phone: String,
-  email: { type: String, unique: true, index: true },
+  email: { type: String, unique: true },
   password: String,
 });
-
-// Explicit index (in case schema was modified later)
-userSchema.index({ email: 1 }, { unique: true });
 
 const loanSchema = new mongoose.Schema({
   borrowerName: String,
@@ -76,17 +62,6 @@ const loanSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', userSchema);
 const Loan = mongoose.model('Loan', loanSchema);
-
-// Ensure indexes are created at startup (non-blocking)
-(async () => {
-  try {
-    await User.createCollection();
-    await User.syncIndexes();
-    console.log('✅ User indexes ensured');
-  } catch (err) {
-    console.error('❌ Error ensuring User indexes:', err);
-  }
-})();
 
 // ===== JWT Verification Middleware =====
 function verifyToken(req, res, next) {
@@ -114,11 +89,11 @@ app.post('/api/register', async (req, res) => {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
-    const exists = await User.findOne({ email }).lean().exec();
+    const exists = await User.findOne({ email });
     if (exists)
       return res.status(409).json({ message: 'Email already registered' });
 
-    const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+    const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = new User({ name, phone, email, password: hashedPassword });
     await newUser.save();
 
@@ -131,42 +106,28 @@ app.post('/api/register', async (req, res) => {
 
 // ----- LOGIN -----
 app.post('/api/login', async (req, res) => {
-  console.time('loginTotal');
   try {
     const { email, password } = req.body;
+    const user = await User.findOne({ email });
 
-    console.time('dbUserLookup');
-    const user = await User.findOne({ email }).lean().exec();
-    console.timeEnd('dbUserLookup');
-
-    if (!user) {
-      console.timeEnd('loginTotal');
+    if (!user)
       return res.status(401).json({ message: 'Invalid credentials' });
-    }
 
-    console.time('passwordCompare');
     const validPass = await bcrypt.compare(password, user.password);
-    console.timeEnd('passwordCompare');
-
-    if (!validPass) {
-      console.timeEnd('loginTotal');
+    if (!validPass)
       return res.status(401).json({ message: 'Invalid credentials' });
-    }
 
-    console.time('jwtSign');
+    // Generate JWT
     const token = jwt.sign(
       { name: user.name, email: user.email, phone: user.phone },
       SECRET_KEY,
       { expiresIn: '2h' }
     );
-    console.timeEnd('jwtSign');
 
-    console.timeEnd('loginTotal');
-    return res.status(200).json({ token });
+    res.status(200).json({ token });
   } catch (err) {
-    console.timeEnd('loginTotal');
     console.error('❌ Login error:', err);
-    return res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
@@ -203,7 +164,7 @@ app.get('/api/loans/:userEmail', verifyToken, async (req, res) => {
     if (req.user.email !== userEmail)
       return res.status(403).json({ message: 'Forbidden' });
 
-    const loans = await Loan.find({ userEmail }).exec();
+    const loans = await Loan.find({ userEmail });
     res.status(200).json(loans);
   } catch (err) {
     console.error('❌ Fetch loans error:', err);
