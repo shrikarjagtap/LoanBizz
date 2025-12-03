@@ -6,7 +6,6 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const { get } = require('http');
 
 const app = express();
 const PORT = 5000;
@@ -20,7 +19,7 @@ app.use(
       'http://localhost:4200',
       'http://192.168.1.134:4200'
     ],
-    methods:['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
   })
@@ -32,7 +31,12 @@ const mongoURI =
   'mongodb+srv://shrikarjagtap2_db_user:shrikar0707@loanbizzcluster.cceh8an.mongodb.net/?retryWrites=true&w=majority&appName=LoanBizzCluster';
 
 mongoose
-  .connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(mongoURI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    maxPoolSize: 10,                 // reasonable pool size
+    serverSelectionTimeoutMS: 10000, // fail fast if DB unreachable
+  })
   .then(() => console.log('✅ MongoDB connected successfully'))
   .catch((err) => console.error('❌ MongoDB connection error:', err));
 
@@ -40,7 +44,7 @@ mongoose
 const userSchema = new mongoose.Schema({
   name: String,
   phone: String,
-  email: { type: String, unique: true },
+  email: { type: String, unique: true, index: true }, // ensure indexed lookup
   password: String,
 });
 
@@ -81,6 +85,11 @@ function verifyToken(req, res, next) {
 
 // ================== ROUTES ==================
 
+// ----- HEALTH CHECK (used to warm up backend) -----
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'ok', time: new Date().toISOString() });
+});
+
 // ----- REGISTER -----
 app.post('/api/register', async (req, res) => {
   try {
@@ -108,8 +117,9 @@ app.post('/api/register', async (req, res) => {
 app.post('/api/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
 
+    // Fast indexed lookup by email
+    const user = await User.findOne({ email }).lean();
     if (!user)
       return res.status(401).json({ message: 'Invalid credentials' });
 
@@ -199,7 +209,7 @@ app.put('/api/loans/:id', verifyToken, async (req, res) => {
   }
 });
 
-// ----- Health Check -----
+// ----- Health Check (root) -----
 app.get('/', (req, res) => {
   res.send('✅ LoanBizz Backend is running successfully!');
 });

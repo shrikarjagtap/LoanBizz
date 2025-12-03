@@ -15,7 +15,6 @@ export interface User {
 })
 export class AuthService {
   private apiUrl = environment.apiUrl;
-  // private apiUrl = ['https://loanbizz-server.onrender.com/api','http://localhost:5000/api'];
   private currentUser: User | null = null;
 
   constructor(private http: HttpClient) {
@@ -26,6 +25,11 @@ export class AuthService {
         this.currentUser = this.decodeToken(token);
       }
     }
+  }
+
+  // ✅ Warm up backend (used on login page load)
+  pingBackend(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/health`);
   }
 
   // ✅ Register new user

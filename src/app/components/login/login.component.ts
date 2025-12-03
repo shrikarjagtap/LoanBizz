@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AuthService, User } from '../../services/auth.service';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -12,7 +12,7 @@ import { LoanService } from '../../services/loan.service';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   email: string = '';
   password: string = '';
   isLoading: boolean = false;
@@ -23,6 +23,14 @@ export class LoginComponent {
     private loanService: LoanService,
     private router: Router
   ) {}
+
+  ngOnInit(): void {
+    // 🔥 Warm up backend & DB when login page opens
+    this.authService.pingBackend().subscribe({
+      next: () => console.log('Backend warmed up'),
+      error: (err) => console.error('Health check failed:', err)
+    });
+  }
 
   loginUser(): void {
     // Prevent double-click spam
@@ -38,9 +46,7 @@ export class LoginComponent {
         this.isLoading = false;
 
         if (user && user.email) {
-          // Load user loans in background
           this.loanService.setCurrentUser(user.email);
-          // Optional: you can replace alert with a toast later
           alert('✅ Login successful!');
           this.router.navigate(['/home']);
         } else {
