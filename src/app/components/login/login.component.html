@@ -1,9 +1,13 @@
+<div class="loading-overlay" *ngIf="isLoading">
+  <div class="spinner"></div>
+  <div class="loading-text">DB delay. Logging you in, please wait...</div>
+</div>
+
 <div class="auth-container">
   <div class="auth-card">
     <h2 class="page-title">Login</h2>
 
     <form (ngSubmit)="loginUser()" #loginForm="ngForm">
-
       <!-- Gmail / ID -->
       <label for="gmail">Gmail ID</label>
       <input
@@ -13,6 +17,7 @@
         [(ngModel)]="email"
         required
         placeholder="Enter your Gmail"
+        autocomplete="email"
       />
 
       <!-- Password -->
@@ -24,14 +29,26 @@
         [(ngModel)]="password"
         required
         placeholder="Enter your password"
+        autocomplete="current-password"
       />
 
-      <button type="submit" [disabled]="loginForm.invalid" class="auth-btn">
-        Login
+      <!-- Inline error -->
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+
+      <button
+        type="submit"
+        [disabled]="loginForm.invalid || isLoading"
+        class="auth-btn"
+      >
+        <span *ngIf="!isLoading">Login</span>
+        <span *ngIf="isLoading">Logging in...</span>
       </button>
 
       <p class="redirect-text">
-        Don't have an account? <a routerLink="/register">Register here</a>
+        Don't have an account?
+        <a routerLink="/register">Register here</a>
       </p>
     </form>
   </div>

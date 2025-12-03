@@ -16,6 +16,7 @@ export class LoginComponent {
   email: string = '';
   password: string = '';
   isLoading: boolean = false;
+  errorMessage: string | null = null;
 
   constructor(
     private authService: AuthService,
@@ -24,6 +25,12 @@ export class LoginComponent {
   ) {}
 
   loginUser(): void {
+    // Prevent double-click spam
+    if (this.isLoading) {
+      return;
+    }
+
+    this.errorMessage = null;
     this.isLoading = true;
 
     this.authService.login(this.email, this.password).subscribe({
@@ -31,17 +38,19 @@ export class LoginComponent {
         this.isLoading = false;
 
         if (user && user.email) {
+          // Load user loans in background
           this.loanService.setCurrentUser(user.email);
+          // Optional: you can replace alert with a toast later
           alert('✅ Login successful!');
           this.router.navigate(['/home']);
         } else {
-          alert('❌ Invalid Gmail or password');
+          this.errorMessage = 'Invalid email or password.';
         }
       },
       error: (err) => {
         this.isLoading = false;
         console.error('Login failed:', err);
-        alert('❌ Invalid Gmail or password');
+        this.errorMessage = 'Invalid email or password.';
       }
     });
   }
