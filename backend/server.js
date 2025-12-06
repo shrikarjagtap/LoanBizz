@@ -17,7 +17,9 @@ app.use(
     origin: [
       'https://loan-bizz-3wsd.vercel.app',
       'http://localhost:4200',
-      'http://192.168.1.134:4200'
+      'http://192.168.1.134:4200',
+      'http://localhost',          // 👈 Capacitor (Android WebView)
+      'capacitor://localhost'      // 👈 Older Capacitor / safety
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
