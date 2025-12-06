@@ -29,8 +29,12 @@ app.use(
 app.use(bodyParser.json());
 
 // ===== MongoDB Connection =====
+// const mongoURI =
+//   'mongodb+srv://shrikarjagtap2_db_user:shrikar0707@loanbizzcluster.cceh8an.mongodb.net/?retryWrites=true&w=majority&appName=LoanBizzCluster';
+
 const mongoURI =
-  'mongodb+srv://shrikarjagtap2_db_user:shrikar0707@loanbizzcluster.cceh8an.mongodb.net/?retryWrites=true&w=majority&appName=LoanBizzCluster';
+  'mongodb+srv://shrikarjagtap2_db_user:shrikar0707@loanbizzcluster.cceh8an.mongodb.net/test?retryWrites=true&w=majority&appName=LoanBizzCluster';
+
 
 mongoose
   .connect(mongoURI, {
