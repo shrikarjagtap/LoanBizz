@@ -12,15 +12,23 @@ const PORT = 5000;
 const SECRET_KEY = 'SECRET_KEY'; // ⚠️ Use .env in production!
 
 // ===== Middleware =====
+const allowedOrigins = [
+  'https://loan-bizz-3wsd.vercel.app',
+  'http://localhost:4200',
+  'http://192.168.1.134:4200',
+  'http://localhost',        // Capacitor Android WebView
+  'capacitor://localhost'    // Capacitor scheme
+];
+
 app.use(
   cors({
-    origin: [
-      'https://loan-bizz-3wsd.vercel.app',
-      'http://localhost:4200',
-      'http://192.168.1.134:4200',
-      'http://localhost',          // 👈 Capacitor (Android WebView)
-      'capacitor://localhost'      // 👈 Older Capacitor / safety
-    ],
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      console.log('❌ CORS blocked origin:', origin);
+      return callback(new Error('Not allowed by CORS'));
+    },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
@@ -29,19 +37,15 @@ app.use(
 app.use(bodyParser.json());
 
 // ===== MongoDB Connection =====
-// const mongoURI =
-//   'mongodb+srv://shrikarjagtap2_db_user:shrikar0707@loanbizzcluster.cceh8an.mongodb.net/?retryWrites=true&w=majority&appName=LoanBizzCluster';
-
 const mongoURI =
   'mongodb+srv://shrikarjagtap2_db_user:shrikar0707@loanbizzcluster.cceh8an.mongodb.net/test?retryWrites=true&w=majority&appName=LoanBizzCluster';
-
 
 mongoose
   .connect(mongoURI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    maxPoolSize: 10,                 // reasonable pool size
-    serverSelectionTimeoutMS: 10000, // fail fast if DB unreachable
+    maxPoolSize: 10,
+    serverSelectionTimeoutMS: 10000,
   })
   .then(() => console.log('✅ MongoDB connected successfully'))
   .catch((err) => console.error('❌ MongoDB connection error:', err));
@@ -50,7 +54,7 @@ mongoose
 const userSchema = new mongoose.Schema({
   name: String,
   phone: String,
-  email: { type: String, unique: true, index: true }, // ensure indexed lookup
+  email: { type: String, unique: true, index: true },
   password: String,
 });
 
@@ -67,11 +71,18 @@ const loanSchema = new mongoose.Schema({
   investorPercentage: Number,
   totalTenure: Number,
   isClosed: { type: Boolean, default: false },
-  userEmail: String, // linked to user's email
+  userEmail: String,
 });
 
 const User = mongoose.model('User', userSchema);
 const Loan = mongoose.model('Loan', loanSchema);
+
+// ===== Helpers =====
+function buildEmailQuery(rawEmail) {
+  const email = (rawEmail || '').trim();
+  const escaped = email.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return { email: new RegExp('^' + escaped + '$', 'i') }; // case-insensitive
+}
 
 // ===== JWT Verification Middleware =====
 function verifyToken(req, res, next) {
@@ -82,7 +93,7 @@ function verifyToken(req, res, next) {
   try {
     const token = authHeader.replace('Bearer ', '');
     const decoded = jwt.verify(token, SECRET_KEY);
-    req.user = decoded; // user info from token
+    req.user = decoded;
     next();
   } catch (err) {
     return res.status(401).json({ message: 'Invalid or expired token.' });
@@ -100,22 +111,34 @@ app.get('/api/health', (req, res) => {
 app.post('/api/register', async (req, res) => {
   try {
     const { name, phone, email, password } = req.body;
+
     if (!name || !phone || !email || !password) {
       return res.status(400).json({ message: 'All fields are required' });
     }
 
-    const exists = await User.findOne({ email });
-    if (exists)
+    const emailQuery = buildEmailQuery(email);
+    const exists = await User.findOne(emailQuery);
+
+    if (exists) {
       return res.status(409).json({ message: 'Email already registered' });
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = new User({ name, phone, email, password: hashedPassword });
+    const normalizedEmail = (email || '').trim();
+
+    const newUser = new User({
+      name,
+      phone,
+      email: normalizedEmail,
+      password: hashedPassword
+    });
+
     await newUser.save();
 
     res.status(201).json({ message: 'Registration successful' });
   } catch (err) {
     console.error('❌ Register error:', err);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error during registration' });
   }
 });
 
@@ -124,16 +147,32 @@ app.post('/api/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Fast indexed lookup by email
-    const user = await User.findOne({ email }).lean();
-    if (!user)
-      return res.status(401).json({ message: 'Invalid credentials' });
+    const emailQuery = buildEmailQuery(email);
+    const user = await User.findOne(emailQuery);
 
-    const validPass = await bcrypt.compare(password, user.password);
-    if (!validPass)
+    if (!user) {
       return res.status(401).json({ message: 'Invalid credentials' });
+    }
 
-    // Generate JWT
+    let passwordMatches = false;
+
+    if (user.password && user.password.startsWith('$2')) {
+      passwordMatches = await bcrypt.compare(password, user.password);
+    } else {
+      passwordMatches = user.password === password;
+
+      if (passwordMatches) {
+        const newHash = await bcrypt.hash(password, 10);
+        user.password = newHash;
+        await user.save();
+        console.log(`✅ Upgraded password hash for user ${user.email}`);
+      }
+    }
+
+    if (!passwordMatches) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
     const token = jwt.sign(
       { name: user.name, email: user.email, phone: user.phone },
       SECRET_KEY,
@@ -143,7 +182,7 @@ app.post('/api/login', async (req, res) => {
     res.status(200).json({ token });
   } catch (err) {
     console.error('❌ Login error:', err);
-    res.status(500).json({ message: 'Server error' });
+    res.status(500).json({ message: 'Server error during login' });
   }
 });
 
@@ -152,14 +191,12 @@ app.post('/api/loans', verifyToken, async (req, res) => {
   try {
     const loanData = req.body;
 
-    // Validate minimum fields
     if (!loanData.borrowerName || !loanData.startDate || !loanData.endDate) {
       return res
         .status(400)
         .json({ message: 'Missing required loan fields' });
     }
 
-    // Add user's email from token if not provided
     if (!loanData.userEmail) loanData.userEmail = req.user.email;
 
     const loan = new Loan(loanData);
@@ -176,7 +213,6 @@ app.get('/api/loans/:userEmail', verifyToken, async (req, res) => {
   try {
     const { userEmail } = req.params;
 
-    // Only allow user to access their own loans
     if (req.user.email !== userEmail)
       return res.status(403).json({ message: 'Forbidden' });
 
