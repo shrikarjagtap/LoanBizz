@@ -16,6 +16,7 @@ const allowedOrigins = [
   'https://loan-bizz-3wsd.vercel.app',
   'http://localhost:4200',
   'http://192.168.1.134:4200',
+  'https://localhost',       z// Capacitor Android WebView
   'http://localhost',        // Capacitor Android WebView
   'capacitor://localhost'    // Capacitor scheme
 ];
